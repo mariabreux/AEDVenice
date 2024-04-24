@@ -44,8 +44,8 @@ fun NavigationGraph(navController: NavHostController){
     var showDialog by remember { mutableStateOf(false) }
 
     NavHost(navController = navController, startDestination = "How To Act") {
-       // composable("Home"){ HomeScreen(navController)}
-        composable("Home"){ ManageAedScreen() }
+        composable("Home"){ HomeScreen(navController)}
+        //composable("Home"){ ManageAedScreen() }
         composable("How To Act"){ HowToActScreen(navController)}
         composable("User Login"){ UserLoginScreen(navController, onDismiss = {showDialog = true})}
         composable("Login"){LoginScreen(navController)}

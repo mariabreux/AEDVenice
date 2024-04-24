@@ -63,6 +63,7 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     //noinspection UseTomlInstead
     implementation("androidx.compose.material:material")
+    implementation(libs.androidx.appcompat)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -71,5 +72,12 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation("androidx.navigation:navigation-compose:2.7.7")
+
+    //Google Maps
+    implementation ("com.google.maps.android:maps-compose:4.3.3")
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
+
+    //Dagger - Hilt
+    implementation("androidx.hilt:hilt-navigation-fragment:1.2.0")
 
 }

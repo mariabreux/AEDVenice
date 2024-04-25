@@ -1,5 +1,6 @@
 package com.finalproject.aedvenice.utils
 
+import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -9,6 +10,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.finalproject.aedvenice.R
+import com.finalproject.aedvenice.maps.MapsViewModel
 import com.finalproject.aedvenice.ui.screens.HomeScreen
 import com.finalproject.aedvenice.ui.screens.HowToActScreen
 import com.finalproject.aedvenice.ui.screens.LoginScreen
@@ -40,11 +42,12 @@ object NavigationUtils{
 }
 
 @Composable
-fun NavigationGraph(navController: NavHostController){
+fun NavigationGraph(navController: NavHostController, viewModel: MapsViewModel){
     var showDialog by remember { mutableStateOf(false) }
 
+
     NavHost(navController = navController, startDestination = "How To Act") {
-        composable("Home"){ HomeScreen(navController)}
+        composable("Home"){ HomeScreen(navController, viewModel)}
         //composable("Home"){ ManageAedScreen() }
         composable("How To Act"){ HowToActScreen(navController)}
         composable("User Login"){ UserLoginScreen(navController, onDismiss = {showDialog = true})}

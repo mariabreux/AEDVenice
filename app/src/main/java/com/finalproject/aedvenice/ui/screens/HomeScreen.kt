@@ -13,36 +13,54 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.finalproject.aedvenice.maps.MapsViewModel
+import com.finalproject.aedvenice.maps.composable.MapScreen
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapUiSettings
 
+//@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+//@Composable
+//fun HomeScreen(
+//    navController: NavHostController,
+//    viewModel: MapsViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+//){
+//    val scaffoldState = rememberScaffoldState()
+//    val uiSettings = remember {
+//        MapUiSettings(zoomControlsEnabled = false)
+//    }
+//
+//    Scaffold(
+//        scaffoldState = scaffoldState,
+//    ) {
+//        GoogleMap(
+//            modifier = Modifier
+//                .padding(16.dp)
+//                .fillMaxSize(),
+//            properties = viewModel.state.properties,
+//            uiSettings = uiSettings
+//        )
+//    }
+//}
+
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun HomeScreen(
-    navController: NavHostController,
-    viewModel: MapsViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
-){
+fun HomeScreen(navController: NavHostController, viewModel: MapsViewModel){
     val scaffoldState = rememberScaffoldState()
-    val uiSettings = remember {
-        MapUiSettings(zoomControlsEnabled = false)
-    }
 
     Scaffold(
         scaffoldState = scaffoldState,
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxSize()
     ) {
-        GoogleMap(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxSize(),
-            properties = viewModel.state.properties,
-            uiSettings = uiSettings
-        )
+        MapScreen(state = viewModel.state.value)
+
     }
+
 }
 
 
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
-    HomeScreen(navController = rememberNavController())
+    //HomeScreen(navController = rememberNavController())
 }

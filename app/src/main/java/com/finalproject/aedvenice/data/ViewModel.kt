@@ -1,12 +1,15 @@
-package com.finalproject.aedvenice.maps
+package com.finalproject.aedvenice.data
 
 import android.annotation.SuppressLint
 import android.graphics.Color
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.finalproject.aedvenice.data.aed.Aed
+import com.finalproject.aedvenice.data.aed.AedBasics
+import com.finalproject.aedvenice.data.aed.GeoPoint
+import com.finalproject.aedvenice.maps.MapState
 import com.google.android.gms.location.FusedLocationProviderClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -16,7 +19,43 @@ import javax.inject.Inject
 //}
 
 @HiltViewModel
-class MapsViewModel @Inject constructor(): ViewModel() {
+class ViewModel @Inject constructor(): ViewModel() {
+    /*AEDs*/
+
+    private val firebaseManager = FirebaseManager()
+
+    private val _aeds = mutableStateOf<List<AedBasics>>(emptyList())
+    val aeds: State<List<AedBasics>> = _aeds
+
+    init {
+        getAedBasicsList()
+    }
+
+    private fun getAedBasicsList(){
+        firebaseManager.getAedBasicsList {  aedBasics ->
+            _aeds.value = aedBasics
+        }
+    }
+
+    fun createAed(/*TODO: receive aed data*/){
+        val new = Aed(
+            AedBasics(
+                "via dorsoduro",
+                GeoPoint(45.4785,
+                    12.2533),
+                "functioning"),
+            "second aed",
+            "venice",
+            "inside",
+            "Monday: 2-4",
+            listOf("123", "456")
+        )
+        firebaseManager.createAed(new)
+    }
+
+
+
+    /*MAPS*/
 
     val state: MutableState<MapState> = mutableStateOf(
         MapState(
@@ -45,8 +84,6 @@ class MapsViewModel @Inject constructor(): ViewModel() {
             // Show error or something
         }
     }
-
-
 
     companion object {
         private val POLYGON_FILL_COLOR = Color.parseColor("#ABF44336")

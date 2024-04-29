@@ -1,11 +1,8 @@
 package com.finalproject.aedvenice
 
-import android.Manifest
-import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,9 +15,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.core.content.ContextCompat
 import androidx.navigation.compose.rememberNavController
-import com.finalproject.aedvenice.maps.MapsViewModel
+import com.finalproject.aedvenice.data.ViewModel
 import com.finalproject.aedvenice.maps.PermissionsManager
 import com.finalproject.aedvenice.ui.components.MainAppBar
 import com.finalproject.aedvenice.ui.theme.AEDVeniceTheme
@@ -29,7 +25,7 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 
 class MainActivity : ComponentActivity() {
-    private val viewModel: MapsViewModel by viewModels()
+    private val viewModel: ViewModel by viewModels()
 
 
 
@@ -57,7 +53,7 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun MainScreen(viewModel: MapsViewModel) {
+fun MainScreen(viewModel: ViewModel) {
     val navController = rememberNavController()
     val currentRoute = remember { mutableStateOf("") }
 

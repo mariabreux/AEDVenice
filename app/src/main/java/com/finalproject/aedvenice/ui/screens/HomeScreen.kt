@@ -6,16 +6,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
-import com.finalproject.aedvenice.maps.MapsViewModel
+import com.finalproject.aedvenice.data.ViewModel
 import com.finalproject.aedvenice.maps.composable.MapScreen
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.MapUiSettings
 
 //@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 //@Composable
@@ -43,7 +39,7 @@ import com.google.maps.android.compose.MapUiSettings
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun HomeScreen(navController: NavHostController, viewModel: MapsViewModel){
+fun HomeScreen(navController: NavHostController, viewModel: ViewModel){
     val scaffoldState = rememberScaffoldState()
 
     Scaffold(

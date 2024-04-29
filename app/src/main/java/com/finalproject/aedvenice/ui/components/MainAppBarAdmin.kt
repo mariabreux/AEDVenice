@@ -18,18 +18,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.finalproject.aedvenice.R
 import com.finalproject.aedvenice.ui.theme.DarkPink
 import com.finalproject.aedvenice.ui.theme.LightPink
 import com.finalproject.aedvenice.utils.NavigationUtils
-import com.finalproject.aedvenice.utils.navBarItems
 import com.finalproject.aedvenice.utils.navBarItemsAdmin
 
 @Composable

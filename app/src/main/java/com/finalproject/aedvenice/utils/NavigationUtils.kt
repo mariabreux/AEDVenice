@@ -1,6 +1,5 @@
 package com.finalproject.aedvenice.utils
 
-import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -10,12 +9,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.finalproject.aedvenice.R
-import com.finalproject.aedvenice.maps.MapsViewModel
+import com.finalproject.aedvenice.data.ViewModel
 import com.finalproject.aedvenice.ui.screens.HomeScreen
 import com.finalproject.aedvenice.ui.screens.HowToActScreen
 import com.finalproject.aedvenice.ui.screens.LoginScreen
 import com.finalproject.aedvenice.ui.screens.ManageAedScreen
-import com.finalproject.aedvenice.ui.screens.ReportProblemScreen
 import com.finalproject.aedvenice.ui.screens.UserLoginScreen
 
 val navBarItems: Map<String, Int> = mapOf(
@@ -42,13 +40,13 @@ object NavigationUtils{
 }
 
 @Composable
-fun NavigationGraph(navController: NavHostController, viewModel: MapsViewModel){
+fun NavigationGraph(navController: NavHostController, viewModel: ViewModel){
     var showDialog by remember { mutableStateOf(false) }
 
 
-    NavHost(navController = navController, startDestination = "How To Act") {
+    NavHost(navController = navController, startDestination = "Manage Aed") {
         composable("Home"){ HomeScreen(navController, viewModel)}
-        //composable("Home"){ ManageAedScreen() }
+        composable("Manage Aed"){ ManageAedScreen(viewModel) }
         composable("How To Act"){ HowToActScreen(navController)}
         composable("User Login"){ UserLoginScreen(navController, onDismiss = {showDialog = true})}
         composable("Login"){LoginScreen(navController)}

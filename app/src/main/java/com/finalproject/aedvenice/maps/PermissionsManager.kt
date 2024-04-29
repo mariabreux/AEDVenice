@@ -5,10 +5,11 @@ import android.content.pm.PackageManager
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import com.finalproject.aedvenice.data.ViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 
-class PermissionsManager(private val activity: ComponentActivity, viewModel: MapsViewModel) {
+class PermissionsManager(private val activity: ComponentActivity, viewModel: ViewModel) {
     private val requestPermissionLauncher =
         activity.registerForActivityResult(
             ActivityResultContracts.RequestPermission()
@@ -20,7 +21,7 @@ class PermissionsManager(private val activity: ComponentActivity, viewModel: Map
 
     private val fusedLocationProviderClient: FusedLocationProviderClient =
         LocationServices.getFusedLocationProviderClient(activity)
-    fun askPermissions(viewModel: MapsViewModel) = when {
+    fun askPermissions(viewModel: ViewModel) = when {
         ContextCompat.checkSelfPermission(
             activity,
             Manifest.permission.ACCESS_FINE_LOCATION

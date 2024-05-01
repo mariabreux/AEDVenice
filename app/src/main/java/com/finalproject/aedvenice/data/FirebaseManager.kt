@@ -108,4 +108,21 @@ class FirebaseManager(){
                 Log.e("Delete Aed", "Error deleting Aed", e)
             }
     }
+
+    fun updateAed(id: String, aed : Aed){
+        db.collection("aedTest") /*TODO: change to Aed*/
+            .document(id)
+            .update(
+                mapOf(
+                    "nome" to aed.name,
+                    "indirizzo" to aed.aedBasics?.address,
+                    "citta" to aed.city,
+                    "geo_point" to aed.aedBasics?.geoPoint,
+                    "note" to aed.aedBasics?.notes,
+                    "orari" to aed.timetable,
+                    "telefono" to aed.phoneNumber,
+                    "ubicazione" to aed.location
+                )
+            )
+    }
 }

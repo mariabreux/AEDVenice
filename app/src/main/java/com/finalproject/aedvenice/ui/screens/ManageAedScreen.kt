@@ -34,6 +34,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.finalproject.aedvenice.data.ViewModel
+import com.finalproject.aedvenice.data.aed.Aed
 import com.finalproject.aedvenice.ui.theme.BorderPink
 import com.finalproject.aedvenice.ui.theme.DarkPink
 
@@ -135,6 +136,10 @@ fun ManageAedScreen(viewModel: ViewModel){
         /*Button(onClick = { viewModel.deleteAed("HUvIKIc9kJK3wrr01m51") }) {
             Text(text = "delete")
         }*/
+        /*Button(onClick = { viewModel.updateAed("HNR2dh19W6xTCirysDVu", Aed()) }) {
+            Text(text = "edit")
+        }*/
+
         Spacer(modifier = Modifier.padding(30.dp))
         Row(
             modifier = Modifier

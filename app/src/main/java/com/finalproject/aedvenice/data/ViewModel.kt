@@ -64,6 +64,24 @@ class ViewModel @Inject constructor(): ViewModel() {
         getAedBasicsList()
     }
 
+    fun updateAed(id: String, aed : Aed /*TODO: receive aed data*/){
+        val update = Aed(
+            AedBasics(
+                null,
+                "lost",
+                GeoPoint(45.4785,
+                    12.2533),
+                "functioning"),
+            "second aed",
+            "venice",
+            "inside",
+            "Monday: 2-4",
+            listOf("123", "456")
+        )
+        firebaseManager.updateAed(id, update)
+        getAedBasicsList()
+    }
+
         /*MAPS*/
 
     val state: MutableState<MapState> = mutableStateOf(

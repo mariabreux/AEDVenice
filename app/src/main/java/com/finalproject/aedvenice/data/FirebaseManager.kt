@@ -13,7 +13,11 @@ class FirebaseManager(){
 
     private val db = FirebaseFirestore.getInstance()
 
-    fun createAed(aed : Aed){
+    fun createAed(
+        aed : Aed,
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit
+    ){
         val newAed = hashMapOf(
             "nome" to aed.name,
             "indirizzo" to aed.aedBasics?.address,
@@ -29,8 +33,10 @@ class FirebaseManager(){
             .add(newAed)
             .addOnSuccessListener { documentReference ->
                 Log.d("TAG", "AED created with ID: ${documentReference.id}")
+                onSuccess()
             }.addOnFailureListener { exception ->
                 Log.e("TAG", "Error creating AED", exception)
+                onFailure()
             }
     }
 
@@ -97,19 +103,30 @@ class FirebaseManager(){
         return aedLiveData
     }
 
-    fun deleteAed(id : String){
+    fun deleteAed(
+        id : String,
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit
+    ){
         db.collection("aedTest") /*TODO: change to Aed*/
             .document(id)
             .delete()
             .addOnSuccessListener {
                 Log.d("Delete Aed", "Aed deleted")
+                onSuccess()
             }
             .addOnFailureListener { e ->
                 Log.e("Delete Aed", "Error deleting Aed", e)
+                onFailure()
             }
     }
 
-    fun updateAed(id: String, aed : Aed){
+    fun updateAed(
+        id: String,
+        aed : Aed,
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit
+    ){
         db.collection("aedTest") /*TODO: change to Aed*/
             .document(id)
             .update(
@@ -124,11 +141,23 @@ class FirebaseManager(){
                     "ubicazione" to aed.location
                 )
             )
+            .addOnSuccessListener {
+                onSuccess()
+            }
+            .addOnFailureListener {
+                onFailure()
+            }
     }
 
     /*Reports*/
 
-    fun createReport(id : String, coordinates : GeoPoint, message : String){
+    fun createReport(
+        id : String,
+        coordinates : GeoPoint,
+        message : String,
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit
+    ){
         val newReport = hashMapOf(
             "aed" to id,
             "coordinates" to coordinates,
@@ -139,20 +168,28 @@ class FirebaseManager(){
             .add(newReport)
             .addOnSuccessListener { documentReference ->
                 Log.d("TAG", "Report created with ID: ${documentReference.id}")
+                onSuccess()
             }.addOnFailureListener { exception ->
                 Log.e("TAG", "Error creating Report", exception)
+                onFailure()
             }
     }
 
-    fun deleteReport(id : String /*TODO: receive on success and on failure*/){
+    fun deleteReport(
+        id : String /*TODO: receive on success and on failure*/,
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit
+    ){
         db.collection("report")
             .document(id)
             .delete()
             .addOnSuccessListener {
                 Log.d("Delete Report", "Report deleted")
+                onSuccess()
             }
             .addOnFailureListener { e ->
                 Log.e("Delete Report", "Error deleting Report", e)
+                onFailure()
             }
     }
 }

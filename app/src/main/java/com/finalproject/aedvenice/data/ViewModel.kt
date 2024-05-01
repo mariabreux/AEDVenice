@@ -43,7 +43,7 @@ class ViewModel @Inject constructor(): ViewModel() {
         }
     }
 
-    fun createAed(/*TODO: receive aed data*/){
+    fun createAed(/*TODO: receive aed data, */onSuccess: () -> Unit, onFailure: () -> Unit){
         val new = Aed(
             AedBasics(
                 null,
@@ -57,19 +57,19 @@ class ViewModel @Inject constructor(): ViewModel() {
             "Monday: 2-4",
             listOf("123", "456")
         )
-        firebaseManager.createAed(new)
+        firebaseManager.createAed(new, onSuccess, onFailure)
     }
 
     fun getAedById(id : String) : MutableLiveData<Aed?>{
         return firebaseManager.getAedById(id)
     }
 
-    fun deleteAed(id : String) {
-        firebaseManager.deleteAed(id)
+    fun deleteAed(id : String, onSuccess: () -> Unit, onFailure: () -> Unit) {
+        firebaseManager.deleteAed(id, onSuccess, onFailure)
         getAedBasicsList()
     }
 
-    fun updateAed(id : String, aed : Aed /*TODO: receive aed data*/){
+    fun updateAed(id : String, aed : Aed /*TODO: receive aed data*/, onSuccess: () -> Unit, onFailure: () -> Unit){
         val update = Aed(
             AedBasics(
                 null,
@@ -83,17 +83,17 @@ class ViewModel @Inject constructor(): ViewModel() {
             "Monday: 2-4",
             listOf("123", "456")
         )
-        firebaseManager.updateAed(id, update)
+        firebaseManager.updateAed(id, update, onSuccess, onFailure)
         getAedBasicsList()
     }
 
     /*REPORTS*/
-    fun createReport(id : String, coordinates : GeoPoint, message : String){
-        firebaseManager.createReport(id, coordinates, message)
+    fun createReport(id : String, coordinates : GeoPoint, message : String, onSuccess: () -> Unit, onFailure: () -> Unit){
+        firebaseManager.createReport(id, coordinates, message, onSuccess, onFailure)
     }
 
-    fun deleteReport(id : String){
-        firebaseManager.deleteReport(id)
+    fun deleteReport(id : String, onSuccess: () -> Unit, onFailure: () -> Unit){
+        firebaseManager.deleteReport(id, onSuccess, onFailure)
     }
 
     /*MAPS*/

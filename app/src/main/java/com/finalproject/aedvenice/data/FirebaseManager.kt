@@ -125,4 +125,34 @@ class FirebaseManager(){
                 )
             )
     }
+
+    /*Reports*/
+
+    fun createReport(id : String, coordinates : GeoPoint, message : String){
+        val newReport = hashMapOf(
+            "aed" to id,
+            "coordinates" to coordinates,
+            "message" to message
+        )
+
+        db.collection("report")
+            .add(newReport)
+            .addOnSuccessListener { documentReference ->
+                Log.d("TAG", "Report created with ID: ${documentReference.id}")
+            }.addOnFailureListener { exception ->
+                Log.e("TAG", "Error creating Report", exception)
+            }
+    }
+
+    fun deleteReport(id : String /*TODO: receive on success and on failure*/){
+        db.collection("report")
+            .document(id)
+            .delete()
+            .addOnSuccessListener {
+                Log.d("Delete Report", "Report deleted")
+            }
+            .addOnFailureListener { e ->
+                Log.e("Delete Report", "Error deleting Report", e)
+            }
+    }
 }

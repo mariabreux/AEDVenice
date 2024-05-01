@@ -27,6 +27,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.finalproject.aedvenice.ui.theme.BorderPink
+import com.finalproject.aedvenice.ui.theme.DarkPink
 
 @Composable
 fun LoginScreen(navController: NavHostController) {
@@ -82,9 +84,9 @@ fun LoginScreen(navController: NavHostController) {
                 modifier = Modifier
                     .fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFC9378B),
+                    containerColor = DarkPink,
                 ),
-                border = BorderStroke(2.dp, Color(0xFF742351)),
+                border = BorderStroke(2.dp, BorderPink),
                 onClick = {
                     navController.navigate("Home")
                     //viewModel.adminMode = true

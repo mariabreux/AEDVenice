@@ -14,6 +14,7 @@ import com.finalproject.aedvenice.ui.screens.HomeScreen
 import com.finalproject.aedvenice.ui.screens.HowToActScreen
 import com.finalproject.aedvenice.ui.screens.LoginScreen
 import com.finalproject.aedvenice.ui.screens.ManageAedScreen
+import com.finalproject.aedvenice.ui.screens.ReportProblemScreen
 import com.finalproject.aedvenice.ui.screens.UserLoginScreen
 
 val navBarItems: Map<String, Int> = mapOf(
@@ -44,12 +45,12 @@ fun NavigationGraph(navController: NavHostController, viewModel: ViewModel){
     var showDialog by remember { mutableStateOf(false) }
 
 
-    NavHost(navController = navController, startDestination = "Manage Aed") {
-        composable("Home"){ HomeScreen(navController, viewModel)}
+    NavHost(navController = navController, startDestination = "Report") {
+        composable("Home"){ HomeScreen(navController, viewModel) }
         composable("Manage Aed"){ ManageAedScreen(viewModel) }
-        composable("How To Act"){ HowToActScreen(navController)}
-        composable("User Login"){ UserLoginScreen(navController, onDismiss = {showDialog = true})}
-        composable("Login"){LoginScreen(navController)}
-
+        composable("How To Act"){ HowToActScreen(navController) }
+        composable("User Login"){ UserLoginScreen(navController, onDismiss = {showDialog = true}) }
+        composable("Login"){ LoginScreen(navController) }
+        composable("Report"){ ReportProblemScreen(navController, viewModel) }
     }
 }

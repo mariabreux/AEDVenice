@@ -5,11 +5,13 @@ import android.graphics.Color
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.finalproject.aedvenice.data.aed.Aed
 import com.finalproject.aedvenice.data.aed.AedBasics
 import com.finalproject.aedvenice.data.aed.GeoPoint
+import com.finalproject.aedvenice.data.aed.Report
 import com.finalproject.aedvenice.maps.MapState
 import com.google.android.gms.location.FusedLocationProviderClient
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,6 +29,9 @@ class ViewModel @Inject constructor(): ViewModel() {
 
     private val _aeds = mutableStateOf<List<AedBasics>>(emptyList())
     val aeds: State<List<AedBasics>> = _aeds
+
+    private val _reports = mutableStateOf<List<Report>>(emptyList())
+    val reports: State<List<Report>> = _reports
 
     init {
         getAedBasicsList()
@@ -64,7 +69,7 @@ class ViewModel @Inject constructor(): ViewModel() {
         getAedBasicsList()
     }
 
-    fun updateAed(id: String, aed : Aed /*TODO: receive aed data*/){
+    fun updateAed(id : String, aed : Aed /*TODO: receive aed data*/){
         val update = Aed(
             AedBasics(
                 null,
@@ -82,7 +87,16 @@ class ViewModel @Inject constructor(): ViewModel() {
         getAedBasicsList()
     }
 
-        /*MAPS*/
+    /*REPORTS*/
+    fun createReport(id : String, coordinates : GeoPoint, message : String){
+        firebaseManager.createReport(id, coordinates, message)
+    }
+
+    fun deleteReport(id : String){
+        firebaseManager.deleteReport(id)
+    }
+
+    /*MAPS*/
 
     val state: MutableState<MapState> = mutableStateOf(
         MapState(

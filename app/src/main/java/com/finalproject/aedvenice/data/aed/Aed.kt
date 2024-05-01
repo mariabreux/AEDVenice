@@ -1,6 +1,7 @@
 package com.finalproject.aedvenice.data.aed
 
 data class AedBasics(
+    val id : String ?= null,
     val address : String ?= null,
     val geoPoint : GeoPoint ?= null,
     val notes : String ?= null

@@ -1,8 +1,6 @@
 package com.finalproject.aedvenice.ui.screens
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,9 +13,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -40,6 +40,8 @@ import com.finalproject.aedvenice.ui.theme.DarkPink
 @Composable
 fun ManageAedScreen(viewModel: ViewModel){
     val aedBasics = viewModel.aeds.value
+
+    //val aed = viewModel.getAedById("8Vc1mw4G6wtTFEu1S5FJ").observeAsState()
 
     var tableData by remember { mutableStateOf(emptyList<TableRow>()) }
     var newAddressText by remember { mutableStateOf("") }
@@ -130,7 +132,9 @@ fun ManageAedScreen(viewModel: ViewModel){
                 }
             }
         }
-
+        /*Button(onClick = { viewModel.deleteAed("HUvIKIc9kJK3wrr01m51") }) {
+            Text(text = "delete")
+        }*/
         Spacer(modifier = Modifier.padding(30.dp))
         Row(
             modifier = Modifier

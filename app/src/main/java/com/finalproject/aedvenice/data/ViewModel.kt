@@ -5,6 +5,7 @@ import android.graphics.Color
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.finalproject.aedvenice.data.aed.Aed
 import com.finalproject.aedvenice.data.aed.AedBasics
@@ -40,6 +41,7 @@ class ViewModel @Inject constructor(): ViewModel() {
     fun createAed(/*TODO: receive aed data*/){
         val new = Aed(
             AedBasics(
+                null,
                 "via dorsoduro",
                 GeoPoint(45.4785,
                     12.2533),
@@ -53,9 +55,16 @@ class ViewModel @Inject constructor(): ViewModel() {
         firebaseManager.createAed(new)
     }
 
+    fun getAedById(id : String) : MutableLiveData<Aed?>{
+        return firebaseManager.getAedById(id)
+    }
 
+    fun deleteAed(id : String) {
+        firebaseManager.deleteAed(id)
+        getAedBasicsList()
+    }
 
-    /*MAPS*/
+        /*MAPS*/
 
     val state: MutableState<MapState> = mutableStateOf(
         MapState(

@@ -5,7 +5,9 @@ import androidx.lifecycle.MutableLiveData
 import com.finalproject.aedvenice.data.aed.Aed
 import com.finalproject.aedvenice.data.aed.AedBasics
 import com.finalproject.aedvenice.data.aed.GeoPoint
+import com.finalproject.aedvenice.data.aed.Report
 import com.google.firebase.Firebase
+import com.google.firebase.database.core.Repo
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
 
@@ -176,7 +178,7 @@ class FirebaseManager(){
     }
 
     fun deleteReport(
-        id : String /*TODO: receive on success and on failure*/,
+        id : String,
         onSuccess: () -> Unit,
         onFailure: () -> Unit
     ){
@@ -190,6 +192,27 @@ class FirebaseManager(){
             .addOnFailureListener { e ->
                 Log.e("Delete Report", "Error deleting Report", e)
                 onFailure()
+            }
+    }
+
+    fun getReports(onUpdate: (List<Report>) -> Unit) {
+        val reportsCollection = db.collection("report")
+        val reports = mutableListOf<Report>()
+        reportsCollection
+            .get()
+            .addOnSuccessListener { result ->
+                for (document in result) {
+                    val reportAed = document.getString("aed")
+                    val reportMessage = document.getString("message")
+                    val geoPoint = document.get("coordinates") as Map<String, Double>
+
+                    reportAed?.let { Log.e("AED id", it) }
+
+                    val rep = Report(reportAed, GeoPoint(geoPoint["latitude"], geoPoint["longitude"]), reportMessage)
+                    reports.add(rep)
+                    Log.e("Report Size in for", reports.size.toString())
+                }
+                onUpdate(reports)
             }
     }
 }

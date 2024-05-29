@@ -146,7 +146,7 @@ fun LoginScreen(
                     scope.launch {
                         viewModel.loginUser(email, password)
                     }
-                    //navController.navigate("Home")
+                    navController.navigate("Manage Report")
                     //viewModel.adminMode = true
                 }
             ) {

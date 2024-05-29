@@ -14,6 +14,7 @@ import com.finalproject.aedvenice.ui.screens.HomeScreen
 import com.finalproject.aedvenice.ui.screens.HowToActScreen
 import com.finalproject.aedvenice.ui.screens.user.LoginScreen
 import com.finalproject.aedvenice.ui.screens.ManageAedScreen
+import com.finalproject.aedvenice.ui.screens.ManageReportScreen
 import com.finalproject.aedvenice.ui.screens.ReportProblemScreen
 import com.finalproject.aedvenice.ui.screens.user.UserLoginScreen
 import com.finalproject.aedvenice.ui.screens.user.RegistrationScreen
@@ -46,7 +47,7 @@ fun NavigationGraph(navController: NavHostController, viewModel: ViewModel){
     var showDialog by remember { mutableStateOf(false) }
 
 
-    NavHost(navController = navController, startDestination = "Login") {
+    NavHost(navController = navController, startDestination = "Manage Report") {
         composable("Home"){ HomeScreen(navController, viewModel) }
         composable("Manage Aed"){ ManageAedScreen(viewModel) }
         composable("How To Act"){ HowToActScreen(navController) }
@@ -54,5 +55,6 @@ fun NavigationGraph(navController: NavHostController, viewModel: ViewModel){
         composable("Login"){ LoginScreen(navController) }
         composable("Report"){ ReportProblemScreen(navController, viewModel) }
         composable("Registration"){ RegistrationScreen(navController) }
+        composable("Manage Report"){ ManageReportScreen(viewModel)}
     }
 }

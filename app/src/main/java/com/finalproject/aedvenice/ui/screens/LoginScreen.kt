@@ -26,7 +26,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.finalproject.aedvenice.ui.theme.BorderPink
 import com.finalproject.aedvenice.ui.theme.DarkPink
 
@@ -59,7 +61,7 @@ fun LoginScreen(navController: NavHostController) {
                 textStyle = TextStyle(Color.Black),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(20.dp)
+                    .height(48.dp)
             )
             Spacer(modifier = Modifier.padding(12.dp))
             Text(
@@ -69,7 +71,7 @@ fun LoginScreen(navController: NavHostController) {
                     .fillMaxWidth()
                     .padding(top = 16.dp)
             )
-            Spacer(modifier = Modifier.padding(12.dp))
+            Spacer(modifier = Modifier.padding(18.dp))
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
@@ -77,7 +79,7 @@ fun LoginScreen(navController: NavHostController) {
                 textStyle = TextStyle(Color.Black),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(20.dp)
+                    .height(48.dp)
             )
             Spacer(modifier = Modifier.padding(40.dp))
             Button(
@@ -106,5 +108,5 @@ fun LoginScreen(navController: NavHostController) {
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
-    //LoginScreen(rememberNavController())
+    LoginScreen(rememberNavController())
 }

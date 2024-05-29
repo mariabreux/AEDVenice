@@ -11,6 +11,7 @@ composeBom = "2023.08.00"
 appcompat = "1.6.1"
 googleServices = "4.4.1"
 firebaseFirestore = "24.11.1"
+googleGmsGoogleServices = "4.4.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -34,4 +35,5 @@ firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 jetbrainsKotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+googleGmsGoogleServices = { id = "com.google.gms.google-services", version.ref = "googleGmsGoogleServices" }
 

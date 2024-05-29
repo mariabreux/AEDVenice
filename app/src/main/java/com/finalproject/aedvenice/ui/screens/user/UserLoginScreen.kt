@@ -1,4 +1,4 @@
-package com.finalproject.aedvenice.ui.screens
+package com.finalproject.aedvenice.ui.screens.user
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.shape.RoundedCornerShape

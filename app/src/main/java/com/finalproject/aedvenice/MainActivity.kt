@@ -23,7 +23,9 @@ import com.finalproject.aedvenice.ui.theme.AEDVeniceTheme
 import com.finalproject.aedvenice.utils.NavigationGraph
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val viewModel: ViewModel by viewModels()
 

@@ -1,7 +1,7 @@
-package com.finalproject.aedvenice.maps
+package com.finalproject.aedvenice.data
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
-class MapApplication: Application()
+class GlobalApplication : Application()

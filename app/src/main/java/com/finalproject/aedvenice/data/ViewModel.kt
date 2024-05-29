@@ -2,6 +2,7 @@ package com.finalproject.aedvenice.data
 
 import android.annotation.SuppressLint
 import android.graphics.Color
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -30,8 +31,7 @@ class ViewModel @Inject constructor(): ViewModel() {
     private val _aeds = mutableStateOf<List<AedBasics>>(emptyList())
     val aeds: State<List<AedBasics>> = _aeds
 
-    private val _reports = mutableStateOf<List<Report>>(emptyList())
-    val reports: State<List<Report>> = _reports
+    var report = mutableListOf<Report>()
 
     init {
         getAedBasicsList()
@@ -94,6 +94,13 @@ class ViewModel @Inject constructor(): ViewModel() {
 
     fun deleteReport(id : String, onSuccess: () -> Unit, onFailure: () -> Unit){
         firebaseManager.deleteReport(id, onSuccess, onFailure)
+    }
+
+    fun getReports() : List<Report>{
+        firebaseManager.getReports { rep -> report = rep.toMutableList() }
+
+
+        return report
     }
 
     /*MAPS*/

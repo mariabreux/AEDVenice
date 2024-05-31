@@ -9,10 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -33,9 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.finalproject.aedvenice.data.auth.presentation.SignInViewModel
 import androidx.navigation.compose.rememberNavController
@@ -49,6 +45,7 @@ fun LoginScreen(
     viewModel : SignInViewModel = hiltViewModel()) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var loggedIn by remember { mutableStateOf(viewModel.isUserLoggedIn()) }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val state = viewModel.signInState.collectAsState(initial = null)
@@ -109,8 +106,12 @@ fun LoginScreen(
                     scope.launch {
                         viewModel.loginUser(email, password)
                     }
-                    navController.navigate("Manage Report")
-                    //viewModel.adminMode = true
+                    if (viewModel.isUserLoggedIn()){
+                        loggedIn = true
+                        navController.navigate("Manage Aed")
+                    }
+                    else
+                        navController.navigate("Manage Report")
                 }
             ) {
                 Text(

@@ -1,6 +1,5 @@
 package com.finalproject.aedvenice.utils
 
-import androidx.compose.material.DropdownMenu
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -52,7 +51,6 @@ fun NavigationGraph(navController: NavHostController, viewModel: ViewModel){
         composable("Manage Aed"){ ManageAedScreen(viewModel) }
         composable("How To Act"){ HowToActScreen(navController) }
         composable("User Login"){LoginScreen(navController)}
-        //composable("Login"){ LoginScreen(navController) }
         composable("Report"){ ReportProblemScreen(navController, viewModel) }
         composable("Registration"){ RegistrationScreen(navController) }
         composable("Manage Report"){ ManageReportScreen(viewModel)}

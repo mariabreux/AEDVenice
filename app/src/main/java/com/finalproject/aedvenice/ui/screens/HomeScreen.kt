@@ -48,7 +48,7 @@ fun HomeScreen(navController: NavHostController, viewModel: ViewModel){
             .padding(16.dp)
             .fillMaxSize()
     ) {
-        MapScreen(state = viewModel.state.value)
+        MapScreen(state = viewModel.state.value, viewModel)
 
     }
 

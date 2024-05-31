@@ -18,9 +18,6 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
-//class MapsViewModel : ViewModel(){
-//    var state by mutableStateOf(MapState())
-//}
 
 @HiltViewModel
 class ViewModel @Inject constructor(): ViewModel() {

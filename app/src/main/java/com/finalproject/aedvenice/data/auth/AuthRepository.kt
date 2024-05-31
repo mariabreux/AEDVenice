@@ -14,4 +14,6 @@ interface AuthRepository {
     fun isUserLoggedIn() : Boolean
 
     fun removeUser()
+
+    fun updatePassword(password: String)
 }

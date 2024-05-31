@@ -45,4 +45,8 @@ class AuthRepositoryImpl @Inject constructor(
     override fun removeUser() {
         firebaseAuth.currentUser?.delete()
     }
+
+    override fun updatePassword(password: String) {
+        val result = firebaseAuth.currentUser?.updatePassword(password)
+    }
 }

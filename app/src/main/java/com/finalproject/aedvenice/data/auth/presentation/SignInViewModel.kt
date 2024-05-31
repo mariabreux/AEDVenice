@@ -44,4 +44,8 @@ class SignInViewModel @Inject constructor(
     fun removeUser(){
         repository.removeUser()
     }
+
+    fun updatePassword(password: String){
+        repository.updatePassword(password)
+    }
 }

@@ -1,5 +1,6 @@
 package com.finalproject.aedvenice.utils
 
+import androidx.compose.material.DropdownMenu
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -16,7 +17,6 @@ import com.finalproject.aedvenice.ui.screens.user.LoginScreen
 import com.finalproject.aedvenice.ui.screens.ManageAedScreen
 import com.finalproject.aedvenice.ui.screens.ManageReportScreen
 import com.finalproject.aedvenice.ui.screens.ReportProblemScreen
-import com.finalproject.aedvenice.ui.screens.user.UserLoginScreen
 import com.finalproject.aedvenice.ui.screens.user.RegistrationScreen
 
 val navBarItems: Map<String, Int> = mapOf(
@@ -51,8 +51,8 @@ fun NavigationGraph(navController: NavHostController, viewModel: ViewModel){
         composable("Home"){ HomeScreen(navController, viewModel) }
         composable("Manage Aed"){ ManageAedScreen(viewModel) }
         composable("How To Act"){ HowToActScreen(navController) }
-        composable("User Login"){ UserLoginScreen(navController, onDismiss = {showDialog = true}) }
-        composable("Login"){ LoginScreen(navController) }
+        composable("User Login"){LoginScreen(navController)}
+        //composable("Login"){ LoginScreen(navController) }
         composable("Report"){ ReportProblemScreen(navController, viewModel) }
         composable("Registration"){ RegistrationScreen(navController) }
         composable("Manage Report"){ ManageReportScreen(viewModel)}

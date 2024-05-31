@@ -12,4 +12,6 @@ interface AuthRepository {
     fun logoutUser()
 
     fun isUserLoggedIn() : Boolean
+
+    fun removeUser()
 }

@@ -108,7 +108,8 @@ fun LoginScreen(
                     }
                     if (viewModel.isUserLoggedIn()){
                         loggedIn = true
-                        navController.navigate("Manage Aed")
+                        //navController.navigate("Manage Aed")
+                        navController.navigate("Test")
                     }
                     else
                         navController.navigate("Manage Report")

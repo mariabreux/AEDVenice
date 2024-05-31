@@ -40,4 +40,8 @@ class SignInViewModel @Inject constructor(
     fun isUserLoggedIn() : Boolean{
         return repository.isUserLoggedIn()
     }
+
+    fun removeUser(){
+        repository.removeUser()
+    }
 }

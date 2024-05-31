@@ -41,4 +41,8 @@ class AuthRepositoryImpl @Inject constructor(
     override fun isUserLoggedIn(): Boolean {
         return (FirebaseAuth.getInstance().getCurrentUser() != null)
     }
+
+    override fun removeUser() {
+        firebaseAuth.currentUser?.delete()
+    }
 }

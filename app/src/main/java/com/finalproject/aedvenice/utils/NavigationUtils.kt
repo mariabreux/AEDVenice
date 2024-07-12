@@ -16,6 +16,7 @@ import com.finalproject.aedvenice.ui.screens.HowToActScreen
 import com.finalproject.aedvenice.ui.screens.user.LoginScreen
 import com.finalproject.aedvenice.ui.screens.ManageAedScreen
 import com.finalproject.aedvenice.ui.screens.ManageReportScreen
+import com.finalproject.aedvenice.ui.screens.ManageUsersScreen
 import com.finalproject.aedvenice.ui.screens.ReportProblemScreen
 import com.finalproject.aedvenice.ui.screens.user.RegistrationScreen
 
@@ -26,9 +27,9 @@ val navBarItems: Map<String, Int> = mapOf(
 )
 
 val navBarItemsAdmin: Map<String, Int> = mapOf(
-    "Home" to R.drawable.home,
+    "Manage Aed" to R.drawable.home,
     "Manage Users" to R.drawable.groups,
-    "Report Problem" to R.drawable.report,
+    "Manage Report" to R.drawable.report,
     "More" to R.drawable.more_vert
 
     )
@@ -51,10 +52,11 @@ fun NavigationGraph(navController: NavHostController, viewModel: ViewModel){
         composable("Home"){ HomeScreen(navController, viewModel) }
         composable("Manage Aed"){ ManageAedScreen(viewModel) }
         composable("How To Act"){ HowToActScreen(navController) }
-        composable("User Login"){LoginScreen(navController)}
+        composable("User Login"){LoginScreen(navController, viewModel)}
         //composable("Login"){ LoginScreen(navController) }
         composable("Report"){ ReportProblemScreen(navController, viewModel) }
-        composable("Registration"){ RegistrationScreen(navController) }
+        composable("Registration"){ RegistrationScreen(navController, viewModel) }
         composable("Manage Report"){ ManageReportScreen(viewModel)}
+        composable("Manage Users"){ ManageUsersScreen(viewModel)}
     }
 }

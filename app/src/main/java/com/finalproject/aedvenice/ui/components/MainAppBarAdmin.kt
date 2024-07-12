@@ -97,8 +97,3 @@ fun MainAppBarAdmin(navController: NavHostController){
 
 
 
-@Preview(showBackground = true)
-@Composable
-fun MainAppBarAdminPrevew(){
-    MainAppBarAdmin(rememberNavController())
-}

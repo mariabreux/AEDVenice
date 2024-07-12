@@ -30,12 +30,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.finalproject.aedvenice.data.ViewModel
 import com.finalproject.aedvenice.data.auth.presentation.SignUpViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun RegistrationScreen(
     navController: NavHostController,
+    aedViewModel: ViewModel,
     viewModel: SignUpViewModel = hiltViewModel()
 ) {
     Log.i("TAG", "1")
@@ -125,6 +127,7 @@ fun RegistrationScreen(
                 if (state.value?.isSuccess?.isNotEmpty() == true){
                     val success = state.value?.isSuccess
                     Toast.makeText(context, "$success", Toast.LENGTH_LONG).show()
+                    aedViewModel.adminMode.value = true
                 }
             }
         }

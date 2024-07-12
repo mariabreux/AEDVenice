@@ -33,6 +33,7 @@ class ViewModel @Inject constructor(): ViewModel() {
 
     var report = mutableListOf<Report>()
 
+    var adminMode = mutableStateOf(false)
     init {
         getAedBasicsList()
     }

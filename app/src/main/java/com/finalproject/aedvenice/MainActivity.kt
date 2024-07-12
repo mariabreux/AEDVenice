@@ -67,7 +67,7 @@ fun MainScreen(viewModel: ViewModel) {
 
     Scaffold(
         topBar = {
-            MainAppBar(navController)
+            MainAppBar(navController, viewModel)
         }
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {

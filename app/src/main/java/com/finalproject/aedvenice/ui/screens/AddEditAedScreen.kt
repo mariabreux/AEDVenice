@@ -1,5 +1,6 @@
 package com.finalproject.aedvenice.ui.screens
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.DropdownMenu
 import androidx.compose.material.Icon
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material3.IconButton
@@ -44,6 +46,9 @@ fun AddEditAedScreen(navController: NavHostController) {
     var name by remember {
         mutableStateOf("")
     }
+
+    var showDays by remember { mutableStateOf(false) }
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top,
@@ -101,6 +106,14 @@ fun AddEditAedScreen(navController: NavHostController) {
         formAED(text = "Telephone", tfValue = name)
         formAED(text = "Note", tfValue = name)
 
+        Text(text = "Timetable: ")
+        Spacer(modifier = Modifier.padding(10.dp))
+        Row{
+            DropdownMenu(expanded = showDays, onDismissRequest = {showDays = false}) {
+
+            }
+        }
+
         //TODO: telephone
         //TODO: timetable
 
@@ -108,110 +121,115 @@ fun AddEditAedScreen(navController: NavHostController) {
 }
 
 
+@SuppressLint("Range")
 @Composable
 fun formAED(text: String, tfValue: String, xValue: String = " ", yValue: String = " ") {
 
-    if (text == "Coordinates") {
-        Row {
-            Column(
-                modifier = Modifier.padding(10.dp)
-            ) {
-                Row {
-                    Text(
-                        text = text + ":",
-                        style = MaterialTheme.typography.displaySmall.copy(
-                            fontWeight = FontWeight.Normal,
-                            fontSize = 25.sp
+    when (text) {
+        "Coordinates" -> {
+            Row {
+                Column(
+                    modifier = Modifier.padding(10.dp)
+                ) {
+                    Row {
+                        Text(
+                            text = text + ":",
+                            style = MaterialTheme.typography.displaySmall.copy(
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 25.sp
+                            )
                         )
-                    )
 
-                    Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.info),
-                        contentDescription = "info",
-                        tint = Color.Unspecified,
-                        modifier = Modifier
-                            .size(40.dp)
-                            .padding(start = 10.dp)
-                        //TODO: show info when pass with the mouse
-                    )
+                        Icon(
+                            imageVector = ImageVector.vectorResource(id = R.drawable.info),
+                            contentDescription = "info",
+                            tint = Color.Unspecified,
+                            modifier = Modifier
+                                .size(40.dp)
+                                .padding(start = 10.dp)
+                            //TODO: show info when pass with the mouse
+                        )
+                    }
+                }
+
+                Column(
+                    modifier = Modifier.padding(10.dp)
+                ) {
+                    var x by remember {
+                        mutableStateOf(xValue)
+                    }
+                    var y by remember {
+                        mutableStateOf(yValue)
+                    }
+                    Row {
+                        OutlinedTextField(
+                            value = x,
+                            onValueChange = { x = it },
+                            modifier = Modifier
+                                .height(45.dp)
+                                .weight(1f)
+
+                        )
+                        Spacer(modifier = Modifier.padding(3.dp))
+                        OutlinedTextField(
+                            value = y,
+                            onValueChange = { y = it },
+                            modifier = Modifier
+                                .height(45.dp)
+                                .weight(1f)
+                        )
+                    }
+
                 }
             }
 
-            Column(
-                modifier = Modifier.padding(10.dp)
-            ) {
-                var x by remember {
-                    mutableStateOf(xValue)
-                }
-                var y by remember {
-                    mutableStateOf(yValue)
-                }
-                Row {
-                    OutlinedTextField(
-                        value = x,
-                        onValueChange = { x = it },
-                        modifier = Modifier
-                            .height(45.dp)
-                            .weight(1f)
-
-                    )
-                    Spacer(modifier = Modifier.padding(3.dp))
-                    OutlinedTextField(
-                        value = y,
-                        onValueChange = { y = it },
-                        modifier = Modifier
-                            .height(45.dp)
-                            .weight(1f)
-                    )
-                }
-
-            }
         }
-    } else {
+        else -> {
 
-        Row {
-            Column(
-                modifier = Modifier.padding(10.dp)
-            ) {
-                Row {
-                    Text(
-                        text = text + ":",
-                        style = MaterialTheme.typography.displaySmall.copy(
-                            fontWeight = FontWeight.Normal,
-                            fontSize = 25.sp
+            Row {
+                Column(
+                    modifier = Modifier.padding(10.dp)
+                ) {
+                    Row {
+                        Text(
+                            text = text + ":",
+                            style = MaterialTheme.typography.displaySmall.copy(
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 25.sp
+                            )
                         )
-                    )
 
-                    Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.info),
-                        contentDescription = "info",
-                        tint = Color.Unspecified,
+                        Icon(
+                            imageVector = ImageVector.vectorResource(id = R.drawable.info),
+                            contentDescription = "info",
+                            tint = Color.Unspecified,
+                            modifier = Modifier
+                                .size(40.dp)
+                                .padding(start = 10.dp)
+                            //TODO: show info when pass with the mouse
+                        )
+                    }
+
+                }
+
+                Column(
+                    modifier = Modifier.padding(10.dp)
+                ) {
+                    var tf by remember {
+                        mutableStateOf(tfValue)
+                    }
+
+                    OutlinedTextField(
+                        value = tf,
+                        onValueChange = { tf = it },
                         modifier = Modifier
-                            .size(40.dp)
-                            .padding(start = 10.dp)
-                        //TODO: show info when pass with the mouse
+                            .fillMaxWidth()
+                            .height(45.dp)
                     )
                 }
 
+
             }
-
-            Column(
-                modifier = Modifier.padding(10.dp)
-            ) {
-                var tf by remember {
-                    mutableStateOf(tfValue)
-                }
-
-                OutlinedTextField(
-                    value = tf,
-                    onValueChange = { tf = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(45.dp)
-                )
-            }
-
-
         }
     }
 

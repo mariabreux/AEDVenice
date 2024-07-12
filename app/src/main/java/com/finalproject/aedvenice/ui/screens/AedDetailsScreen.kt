@@ -35,6 +35,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.finalproject.aedvenice.ui.theme.BorderPink
 import com.finalproject.aedvenice.ui.theme.DarkPink
 import com.finalproject.aedvenice.ui.theme.LightPink
@@ -42,17 +44,19 @@ import com.finalproject.aedvenice.ui.theme.LightPink
 @Composable
 fun AedDetailsScreen(
     onDismiss: () -> Unit,
-    onConfirm: () -> Unit
+    onConfirm: () -> Unit,
+    navController: NavHostController
 ) {
 
     Dialog(onDismissRequest = onDismiss) {
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
+                .clip(RoundedCornerShape(5.dp))
                 .height(415.dp)
                 .width(300.dp)
                 .background(LightPink)
-                .border(1.dp, color = DarkPink, shape = RoundedCornerShape(5.dp))
+                .border(2.dp, color = DarkPink, shape = RoundedCornerShape(5.dp)),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(
                 horizontalArrangement = Arrangement.Center,
@@ -177,7 +181,7 @@ fun AedDetailsScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        //TODO
+                        navController.navigate("Report")
                     },
                 textAlign = TextAlign.Center
             )
@@ -191,7 +195,7 @@ fun AedDetailsScreen(
 @Preview(showBackground = true)
 @Composable
 fun AedDetailScreenPreview() {
-    AedDetailsScreen(onDismiss = { /*TODO*/ }) {
-
-    }
+//    AedDetailsScreen(onDismiss = { /*TODO*/ }) {
+//
+//    }
 }

@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.finalproject.aedvenice.data.ViewModel
 import com.finalproject.aedvenice.ui.theme.DarkPink
 import com.finalproject.aedvenice.ui.theme.LightPink
 import com.finalproject.aedvenice.utils.NavigationUtils
@@ -41,11 +42,11 @@ import com.finalproject.aedvenice.utils.navBarItems
 import com.finalproject.aedvenice.utils.navBarItemsAdmin
 
 @Composable
-fun MainAppBar(navController: NavHostController) {
+fun MainAppBar(navController: NavHostController, viewModel: ViewModel) {
 
     var showLoginButton by remember { mutableStateOf(false) }
 
-    val adminMode = false
+    val adminMode = viewModel.adminMode.value
 
     val appBar: Map<String, Int> = if (!adminMode)
         navBarItems
@@ -146,5 +147,5 @@ fun MainAppBar(navController: NavHostController) {
 @Preview(showBackground = true)
 @Composable
 fun MainAppBarPreview() {
-    MainAppBar(rememberNavController())
+    //MainAppBar(rememberNavController())
 }

@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.finalproject.aedvenice.data.auth.presentation.SignInViewModel
 import androidx.navigation.compose.rememberNavController
+import com.finalproject.aedvenice.data.ViewModel
 import com.finalproject.aedvenice.ui.theme.BorderPink
 import com.finalproject.aedvenice.ui.theme.DarkPink
 import kotlinx.coroutines.launch
@@ -46,6 +47,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun LoginScreen(
     navController: NavHostController,
+    aedViewModel: ViewModel,
     viewModel : SignInViewModel = hiltViewModel()) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -129,7 +131,6 @@ fun LoginScreen(
                 border = BorderStroke(2.dp, BorderPink),
                 onClick = {
                     navController.navigate("Registration")
-                    //viewModel.adminMode = true
                 }
             ) {
                 Text(
@@ -144,6 +145,7 @@ fun LoginScreen(
                     if (state.value?.isSuccess?.isNotEmpty() == true){
                         val success = state.value?.isSuccess
                         Toast.makeText(context, "$success", Toast.LENGTH_LONG).show()
+                        aedViewModel.adminMode.value = true
                     }
                 }
             }
@@ -164,5 +166,5 @@ fun LoginScreen(
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
-    LoginScreen(rememberNavController())
+    //LoginScreen(rememberNavController())
 }

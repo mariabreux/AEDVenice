@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "253200660972",
+    "project_id": "aed-venice",
+    "storage_bucket": "aed-venice.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:253200660972:android:b5ccd4fbee26fad8be28c9",
+        "android_client_info": {
+          "package_name": "com.finalproject.aedvenice"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCqOQBY1uvANLZ1ueao-JknXcfFE-vC7Pw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

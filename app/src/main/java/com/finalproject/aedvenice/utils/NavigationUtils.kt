@@ -19,6 +19,7 @@ import com.finalproject.aedvenice.ui.screens.ManageReportScreen
 import com.finalproject.aedvenice.ui.screens.ManageUsersScreen
 import com.finalproject.aedvenice.ui.screens.ReportProblemScreen
 import com.finalproject.aedvenice.ui.screens.user.RegistrationScreen
+import com.finalproject.aedvenice.ui.screens.user.Test
 
 val navBarItems: Map<String, Int> = mapOf(
     "Home" to R.drawable.home,
@@ -57,5 +58,6 @@ fun NavigationGraph(navController: NavHostController, viewModel: ViewModel){
         composable("Registration"){ RegistrationScreen(navController, viewModel) }
         composable("Manage Report"){ ManageReportScreen(viewModel)}
         composable("Manage Users"){ ManageUsersScreen(viewModel)}
+        composable("Test"){ Test()}
     }
 }

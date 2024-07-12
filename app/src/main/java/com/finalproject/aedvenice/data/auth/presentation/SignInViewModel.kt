@@ -32,4 +32,20 @@ class SignInViewModel @Inject constructor(
          }
         }
     }
+
+    fun logoutUser(){
+        repository.logoutUser()
+    }
+
+    fun isUserLoggedIn() : Boolean{
+        return repository.isUserLoggedIn()
+    }
+
+    fun removeUser(){
+        repository.removeUser()
+    }
+
+    fun updatePassword(password: String){
+        repository.updatePassword(password)
+    }
 }

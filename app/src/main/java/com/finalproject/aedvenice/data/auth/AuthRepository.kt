@@ -9,4 +9,11 @@ interface AuthRepository {
 
     fun registerUser(email : String, password : String) : Flow<Resource<AuthResult>>
 
+    fun logoutUser()
+
+    fun isUserLoggedIn() : Boolean
+
+    fun removeUser()
+
+    fun updatePassword(password: String)
 }

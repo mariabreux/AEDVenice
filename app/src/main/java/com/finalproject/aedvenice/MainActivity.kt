@@ -67,6 +67,7 @@ fun MainScreen(viewModel: ViewModel) {
 
     Scaffold(
         topBar = {
+            //TODO: call function isUserLoggedIn
             MainAppBar(navController, viewModel)
         }
     ) { innerPadding ->

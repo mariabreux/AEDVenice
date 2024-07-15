@@ -44,7 +44,8 @@ import kotlinx.coroutines.launch
 fun LoginScreen(
     navController: NavHostController,
     aedViewModel: ViewModel,
-    viewModel : SignInViewModel = hiltViewModel()) {
+    viewModel: SignInViewModel = hiltViewModel()
+) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var loggedIn by remember { mutableStateOf(viewModel.isUserLoggedIn()) }
@@ -108,13 +109,13 @@ fun LoginScreen(
                     scope.launch {
                         viewModel.loginUser(email, password)
                     }
-                    if (viewModel.isUserLoggedIn()){
+                    if (viewModel.isUserLoggedIn()) {
                         loggedIn = true
                         //navController.navigate("Manage Aed")
                         navController.navigate("Test")
-                    }
-                    else
+                    } else
                         navController.navigate("Manage Report")
+
                 }
             ) {
                 Text(
@@ -144,7 +145,7 @@ fun LoginScreen(
 
             LaunchedEffect(key1 = state.value?.isSuccess) {
                 scope.launch {
-                    if (state.value?.isSuccess?.isNotEmpty() == true){
+                    if (state.value?.isSuccess?.isNotEmpty() == true) {
                         val success = state.value?.isSuccess
                         Toast.makeText(context, "$success", Toast.LENGTH_LONG).show()
                         aedViewModel.adminMode.value = true
@@ -154,7 +155,7 @@ fun LoginScreen(
 
             LaunchedEffect(key1 = state.value?.isError) {
                 scope.launch {
-                    if (state.value?.isError?.isNotEmpty() == true){
+                    if (state.value?.isError?.isNotEmpty() == true) {
                         val error = state.value?.isError
                         Toast.makeText(context, "$error", Toast.LENGTH_LONG).show()
                     }

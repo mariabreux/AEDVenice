@@ -1,6 +1,5 @@
 package com.finalproject.aedvenice.utils
 
-import androidx.compose.material.DropdownMenu
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -11,6 +10,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.finalproject.aedvenice.R
 import com.finalproject.aedvenice.data.ViewModel
+import com.finalproject.aedvenice.ui.screens.AddEditAedScreen
+import com.finalproject.aedvenice.ui.screens.ChangePwdScreen
 import com.finalproject.aedvenice.ui.screens.HomeScreen
 import com.finalproject.aedvenice.ui.screens.HowToActScreen
 import com.finalproject.aedvenice.ui.screens.user.LoginScreen
@@ -31,7 +32,7 @@ val navBarItemsAdmin: Map<String, Int> = mapOf(
     "Manage Aed" to R.drawable.home,
     "Manage Users" to R.drawable.groups,
     "Manage Report" to R.drawable.report,
-    "More" to R.drawable.more_vert
+    "Definitions" to R.drawable.more_vert
 
     )
 
@@ -46,18 +47,18 @@ object NavigationUtils{
 
 @Composable
 fun NavigationGraph(navController: NavHostController, viewModel: ViewModel){
-    var showDialog by remember { mutableStateOf(false) }
-
 
     NavHost(navController = navController, startDestination = "Manage Report") {
         composable("Home"){ HomeScreen(navController, viewModel) }
-        composable("Manage Aed"){ ManageAedScreen(viewModel) }
+        composable("Manage Aed"){ ManageAedScreen(viewModel, navController) }
         composable("How To Act"){ HowToActScreen(navController) }
         composable("User Login"){LoginScreen(navController, viewModel)}
         composable("Report"){ ReportProblemScreen(navController, viewModel) }
         composable("Registration"){ RegistrationScreen(navController, viewModel) }
         composable("Manage Report"){ ManageReportScreen(viewModel)}
         composable("Manage Users"){ ManageUsersScreen(viewModel)}
+        composable("AddEdit Aed"){ AddEditAedScreen(navController) }
+        composable("Change Password"){ ChangePwdScreen(navController) }
         composable("Test"){ Test()}
     }
 }

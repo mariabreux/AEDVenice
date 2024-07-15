@@ -17,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.finalproject.aedvenice.data.ViewModel
+import com.finalproject.aedvenice.data.auth.presentation.SignInViewModel
 import com.finalproject.aedvenice.maps.PermissionsManager
 import com.finalproject.aedvenice.ui.components.MainAppBar
 import com.finalproject.aedvenice.ui.theme.AEDVeniceTheme
@@ -28,7 +29,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val viewModel: ViewModel by viewModels()
-
+    private val signInViewModel: SignInViewModel by viewModels()
 
 
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
@@ -46,7 +47,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MainScreen(viewModel)
+                    MainScreen(viewModel, signInViewModel)
                 }
             }
         }
@@ -55,7 +56,7 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun MainScreen(viewModel: ViewModel) {
+fun MainScreen(viewModel: ViewModel, signInViewModel: SignInViewModel) {
     val navController = rememberNavController()
     val currentRoute = remember { mutableStateOf("") }
 
@@ -68,7 +69,7 @@ fun MainScreen(viewModel: ViewModel) {
     Scaffold(
         topBar = {
             //TODO: call function isUserLoggedIn
-            MainAppBar(navController, viewModel)
+            MainAppBar(navController, viewModel, signInViewModel)
         }
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {

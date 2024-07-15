@@ -42,6 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.finalproject.aedvenice.R
 import com.finalproject.aedvenice.data.ViewModel
 import com.finalproject.aedvenice.data.aed.Aed
@@ -49,7 +50,7 @@ import com.finalproject.aedvenice.ui.theme.BorderPink
 import com.finalproject.aedvenice.ui.theme.DarkPink
 
 @Composable
-fun ManageAedScreen(viewModel: ViewModel) {
+fun ManageAedScreen(viewModel: ViewModel, navController: NavHostController) {
     val aedBasics = viewModel.aeds.value
 
     //val aed = viewModel.getAedById("8Vc1mw4G6wtTFEu1S5FJ").observeAsState()
@@ -82,7 +83,7 @@ fun ManageAedScreen(viewModel: ViewModel) {
                 ),
                 border = BorderStroke(2.dp, BorderPink),
                 onClick = {
-                    //go to Add/Edit Aeds
+                    navController.navigate("AddEdit Aed")
                 }
             ) {
                 Text(

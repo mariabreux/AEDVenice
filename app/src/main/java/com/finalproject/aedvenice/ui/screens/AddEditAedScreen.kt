@@ -1,8 +1,12 @@
 package com.finalproject.aedvenice.ui.screens
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ExposedDropdownMenuBox
 import androidx.compose.material.ExposedDropdownMenuDefaults
@@ -12,16 +16,21 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.finalproject.aedvenice.R
+import com.finalproject.aedvenice.ui.theme.DarkPink
 
 @Composable
 fun AddEditAedScreen(navController: NavHostController) {
@@ -85,93 +94,6 @@ fun AddEditAedScreen(navController: NavHostController) {
         item { formAED(text = "Timetable", tfValue = "") }
         item { Spacer(modifier = Modifier.padding(10.dp)) }
         item { Timetable() }
-    }
-}
-
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-fun Timetable() {
-    val days = arrayOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
-    var expanded by remember { mutableStateOf(false) }
-    var selectedDay by remember { mutableStateOf(days[0]) }
-    var start by remember { mutableStateOf("") }
-    var end by remember { mutableStateOf("") }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 10.dp)
-    ) {
-        Box(modifier = Modifier.weight(1.25f)) {
-            ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = { expanded = !expanded }
-            ) {
-                OutlinedTextField(
-                    value = selectedDay,
-                    onValueChange = {},
-                    readOnly = true,
-                    modifier = Modifier.fillMaxWidth(),
-                    textStyle = MaterialTheme.typography.displaySmall.copy(
-                        fontWeight = FontWeight.Normal,
-                        fontSize = 20.sp
-                    ),
-                    trailingIcon = {ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)}
-                )
-                ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    days.forEach { day ->
-                        DropdownMenuItem(
-                            text = { Text(text = day) },
-                            onClick = {
-                                selectedDay = day
-                                expanded = false
-                            }
-                        )
-                    }
-                }
-            }
-        }
-        Spacer(modifier = Modifier.padding(10.dp))
-
-        OutlinedTextField(
-            value = start,
-            onValueChange = {start = it},
-            modifier = Modifier.weight(1f),
-            textStyle = MaterialTheme.typography.displaySmall.copy(
-                fontWeight = FontWeight.Normal,
-                fontSize = 20.sp
-            ),
-            placeholder = {
-                Text(
-                    text = "From",
-                    style = MaterialTheme.typography.displaySmall.copy(
-                        fontSize = 15.sp,
-                    )
-                )
-            }
-
-        )
-        Spacer(modifier = Modifier.padding(10.dp))
-        OutlinedTextField(
-            value = end,
-            onValueChange = {end = it},
-            modifier = Modifier.weight(1f),
-            textStyle = MaterialTheme.typography.displaySmall.copy(
-                fontWeight = FontWeight.Normal,
-                fontSize = 20.sp
-            ),
-            placeholder = {
-                Text(
-                    text = "To",
-                    style = MaterialTheme.typography.displaySmall.copy(
-                        fontSize = 15.sp,
-                    )
-                )
-            }
-        )
     }
 }
 
@@ -279,6 +201,246 @@ fun formAED(text: String, tfValue: String, xValue: String = " ", yValue: String 
         }
     }
 }
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun Timetable() {
+    val days = arrayOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+    var expanded by remember { mutableStateOf(false) }
+    var selectedDay by remember { mutableStateOf(days[0]) }
+    var start by remember { mutableStateOf("") }
+    var end by remember { mutableStateOf("") }
+    var showDialog by remember { mutableStateOf(false) }
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 10.dp)
+    ) {
+        Box(modifier = Modifier.weight(1.25f)) {
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = { expanded = !expanded }
+            ) {
+                OutlinedTextField(
+                    value = selectedDay,
+                    onValueChange = {},
+                    readOnly = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    textStyle = MaterialTheme.typography.displaySmall.copy(
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 20.sp
+                    ),
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }
+                )
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    days.forEach { day ->
+                        DropdownMenuItem(
+                            text = { Text(text = day) },
+                            onClick = {
+                                selectedDay = day
+                                expanded = false
+                            }
+                        )
+                    }
+                }
+            }
+        }
+        Spacer(modifier = Modifier.padding(10.dp))
+
+        OutlinedTextField(
+            value = start,
+            onValueChange = { start = it },
+            modifier = Modifier.weight(1f),
+            textStyle = MaterialTheme.typography.displaySmall.copy(
+                fontWeight = FontWeight.Normal,
+                fontSize = 20.sp
+            ),
+            placeholder = {
+                Text(
+                    text = "From:",
+                    style = MaterialTheme.typography.displaySmall.copy(
+                        fontSize = 15.sp,
+                    )
+                )
+            }
+
+        )
+        Spacer(modifier = Modifier.padding(10.dp))
+        OutlinedTextField(
+            value = end,
+            onValueChange = { end = it },
+            modifier = Modifier.weight(1f),
+            textStyle = MaterialTheme.typography.displaySmall.copy(
+                fontWeight = FontWeight.Normal,
+                fontSize = 20.sp
+            ),
+            placeholder = {
+                Text(
+                    text = "To:",
+                    style = MaterialTheme.typography.displaySmall.copy(
+                        fontSize = 15.sp,
+                    )
+                )
+            }
+        )
+    }
+    Spacer(modifier = Modifier.padding(5.dp))
+    Text(
+        text = "Split Service ->",
+        style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
+        textDecoration = TextDecoration.Underline,
+
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                showDialog = true
+            },
+        textAlign = TextAlign.Center
+    )
+
+    if (showDialog) {
+        SplitService(onDismiss = { showDialog = false }, selectedDay, start, end)
+
+    }
+}
+
+
+@Composable
+fun SplitService(
+    onDismiss: () -> Unit,
+    selectedDay: String,
+    initialStart: String,
+    initialEnd: String
+) {
+    var start by remember { mutableStateOf(initialStart) }
+    var end by remember { mutableStateOf(initialEnd) }
+    var firstEnd by remember { mutableStateOf("") }
+    var secondStart by remember { mutableStateOf("") }
+
+    Dialog(onDismissRequest = onDismiss) {
+        Column(
+            modifier = Modifier
+                .clip(RoundedCornerShape(5.dp))
+                .height(270.dp)
+                .width(310.dp)
+                .background(Color.White)
+                .border(2.dp, color = DarkPink, shape = RoundedCornerShape(5.dp))
+                .padding(15.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            Row(
+                modifier = Modifier.fillMaxWidth()
+                    .weight(1f),
+            ) {
+                Text(
+                    text = "<- Split Service",
+                    style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
+                    textDecoration = TextDecoration.Underline,
+
+                    modifier = Modifier
+                        .clickable {
+                            onDismiss()
+                        },
+                    textAlign = TextAlign.Start
+                )
+                Spacer(modifier = Modifier.padding(30.dp))
+                Text(
+                    text = selectedDay,
+                    modifier = Modifier.weight(1f),
+                )
+            }
+
+            Row{
+                OutlinedTextField(
+                    value = start,
+                    onValueChange = { start = it },
+                     modifier = Modifier.weight(1f),
+                    textStyle = MaterialTheme.typography.displaySmall.copy(
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 20.sp
+                    ),
+                    placeholder = {
+                        Text(
+                            text = "From:",
+                            style = MaterialTheme.typography.displaySmall.copy(
+                                fontSize = 15.sp,
+                            )
+                        )
+                    }
+
+                )
+                Spacer(modifier = Modifier.padding(10.dp))
+                OutlinedTextField(
+                    value = firstEnd,
+                    onValueChange = { firstEnd = it },
+                    modifier = Modifier.weight(1f),
+                    textStyle = MaterialTheme.typography.displaySmall.copy(
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 20.sp
+                    ),
+                    placeholder = {
+                        Text(
+                            text = "To:",
+                            style = MaterialTheme.typography.displaySmall.copy(
+                                fontSize = 15.sp,
+                            )
+                        )
+                    }
+                )
+            }
+            Spacer(modifier = Modifier.padding(20.dp))
+
+            Row{
+                OutlinedTextField(
+                    value = secondStart,
+                    onValueChange = { secondStart = it },
+                    modifier = Modifier.weight(1f),
+                    textStyle = MaterialTheme.typography.displaySmall.copy(
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 20.sp
+                    ),
+                    placeholder = {
+                        Text(
+                            text = "From:",
+                            style = MaterialTheme.typography.displaySmall.copy(
+                                fontSize = 15.sp,
+                            )
+                        )
+                    }
+
+                )
+                Spacer(modifier = Modifier.padding(10.dp))
+                OutlinedTextField(
+                    value = end,
+                    onValueChange = { end = it },
+                    modifier = Modifier.weight(1f),
+                    textStyle = MaterialTheme.typography.displaySmall.copy(
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 20.sp
+                    ),
+                    placeholder = {
+                        Text(
+                            text = "To:",
+                            style = MaterialTheme.typography.displaySmall.copy(
+                                fontSize = 15.sp,
+                            )
+                        )
+                    }
+                )
+            }
+
+
+        }
+
+    }
+}
+
 
 @Preview(showBackground = true)
 @Composable

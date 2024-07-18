@@ -124,24 +124,6 @@ fun LoginScreen(
                     style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
                 )
             }
-            Spacer(modifier = Modifier.padding(40.dp))
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = DarkPink,
-                ),
-                border = BorderStroke(2.dp, BorderPink),
-                onClick = {
-                    navController.navigate("Registration")
-                }
-            ) {
-                Text(
-                    text = "Registration",
-                    color = Color.White,
-                    style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
-                )
-            }
 
             LaunchedEffect(key1 = state.value?.isSuccess) {
                 scope.launch {

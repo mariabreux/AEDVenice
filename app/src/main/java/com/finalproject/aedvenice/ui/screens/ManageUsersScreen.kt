@@ -28,13 +28,14 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.finalproject.aedvenice.R
 import com.finalproject.aedvenice.data.ViewModel
 import com.finalproject.aedvenice.ui.theme.BorderPink
 import com.finalproject.aedvenice.ui.theme.DarkPink
 
 @Composable
-fun ManageUsersScreen(viewModel: ViewModel){
+fun ManageUsersScreen(viewModel: ViewModel, navController: NavHostController){
     //val users = viewModel.getUsers()
 
 
@@ -66,7 +67,7 @@ fun ManageUsersScreen(viewModel: ViewModel){
                 ),
                 border = BorderStroke(2.dp, BorderPink),
                 onClick = {
-                    //go to Add user
+                    navController.navigate("Registration")
                 }
             ) {
                 Text(

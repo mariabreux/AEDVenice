@@ -56,7 +56,7 @@ fun NavigationGraph(navController: NavHostController, viewModel: ViewModel){
         composable("Report"){ ReportProblemScreen(navController, viewModel) }
         composable("Registration"){ RegistrationScreen(navController, viewModel) }
         composable("Manage Report"){ ManageReportScreen(viewModel)}
-        composable("Manage Users"){ ManageUsersScreen(viewModel)}
+        composable("Manage Users"){ ManageUsersScreen(viewModel, navController)}
         composable("AddEdit Aed"){ AddEditAedScreen(navController) }
         composable("Change Password"){ ChangePwdScreen(navController) }
         composable("Test"){ Test()}

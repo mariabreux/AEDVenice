@@ -39,14 +39,20 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override fun isUserLoggedIn(): Boolean {
-        return (FirebaseAuth.getInstance().getCurrentUser() != null)
+        return (FirebaseAuth.getInstance().currentUser != null)
     }
 
     override fun removeUser() {
-        firebaseAuth.currentUser?.delete()
+        if(isUserRemovable())
+            firebaseAuth.currentUser?.delete()
     }
 
     override fun updatePassword(password: String) {
-        val result = firebaseAuth.currentUser?.updatePassword(password)
+        val result = firebaseAuth.currentUser?.updatePassword(password) //TODO: check original password
+    }
+
+    override fun isUserRemovable(): Boolean {
+        val user = FirebaseAuth.getInstance().currentUser
+        return user?.email != "admin@admin.com" //TODO: if email = admin do toast: unable to remove user
     }
 }

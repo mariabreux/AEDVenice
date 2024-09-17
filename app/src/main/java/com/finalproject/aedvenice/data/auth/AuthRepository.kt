@@ -16,4 +16,6 @@ interface AuthRepository {
     fun removeUser()
 
     fun updatePassword(password: String)
+
+    fun isUserRemovable() : Boolean
 }

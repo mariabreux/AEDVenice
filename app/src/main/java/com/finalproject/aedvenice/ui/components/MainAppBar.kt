@@ -6,7 +6,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -14,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -115,6 +113,7 @@ fun MainAppBar(navController: NavHostController, viewModel: ViewModel, signInVie
 
 @Composable
 fun DefinitionsMenu(expanded: Boolean, onDismiss: () -> Unit, navController: NavHostController, signInViewModel: SignInViewModel, viewModel: ViewModel) {
+    val openAlertDialog = remember { mutableStateOf(false) }
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -145,9 +144,70 @@ fun DefinitionsMenu(expanded: Boolean, onDismiss: () -> Unit, navController: Nav
                 }) {
                 Text("Log Out")
             }
+            Divider(color = Color.DarkGray)
+            if(signInViewModel.isUserRemovable()){
+                DropdownMenuItem(
+                    onClick = {
+                        openAlertDialog.value = true
+                    }) {
+                    Text("Delete Account")
+                }
+            }
         }
     }
+    if(openAlertDialog.value){
+        MyAlertDialog(
+            navController,
+            signInViewModel,
+            viewModel,
+            openAlertDialog,
+            onDismiss
+        )
+    }
+}
 
+@Composable
+fun MyAlertDialog(
+    navController: NavHostController,
+    signInViewModel: SignInViewModel,
+    viewModel: ViewModel,
+    openAlertDialog: MutableState<Boolean>,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = {
+            openAlertDialog.value = false
+            onDismiss()
+        },
+        text = {
+            Text(
+                "Are you sure you want to permanently delete your account?"
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    signInViewModel.removeUser()
+                    navController.navigate("Home")
+                    viewModel.adminMode.value = false
+                    openAlertDialog.value = false
+                    onDismiss()
+                }
+            ) {
+                Text("Delete")
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    openAlertDialog.value = false
+                    onDismiss()
+                }
+            ) {
+                Text("Cancel")
+            }
+        }
+    )
 }
 
 @Preview(showBackground = true)

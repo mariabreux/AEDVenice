@@ -48,4 +48,8 @@ class SignInViewModel @Inject constructor(
     fun updatePassword(password: String){
         repository.updatePassword(password)
     }
+
+    fun isUserRemovable() : Boolean{
+        return repository.isUserRemovable()
+    }
 }

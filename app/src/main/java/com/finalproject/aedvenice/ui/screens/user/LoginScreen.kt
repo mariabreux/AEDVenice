@@ -34,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.finalproject.aedvenice.data.auth.presentation.SignInViewModel
-import androidx.navigation.compose.rememberNavController
 import com.finalproject.aedvenice.data.ViewModel
 import com.finalproject.aedvenice.ui.theme.BorderPink
 import com.finalproject.aedvenice.ui.theme.DarkPink
@@ -48,7 +47,6 @@ fun LoginScreen(
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var loggedIn by remember { mutableStateOf(viewModel.isUserLoggedIn()) }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val state = viewModel.signInState.collectAsState(initial = null)
@@ -109,13 +107,6 @@ fun LoginScreen(
                     scope.launch {
                         viewModel.loginUser(email, password)
                     }
-                    if (viewModel.isUserLoggedIn()) {
-                        loggedIn = true
-                        //navController.navigate("Manage Aed")
-                        navController.navigate("Test")
-                    } else
-                        navController.navigate("Manage Report")
-
                 }
             ) {
                 Text(
@@ -131,6 +122,7 @@ fun LoginScreen(
                         val success = state.value?.isSuccess
                         Toast.makeText(context, "$success", Toast.LENGTH_LONG).show()
                         aedViewModel.adminMode.value = true
+                        navController.navigate("Manage Aed")
                     }
                 }
             }
@@ -140,13 +132,14 @@ fun LoginScreen(
                     if (state.value?.isError?.isNotEmpty() == true) {
                         val error = state.value?.isError
                         Toast.makeText(context, "$error", Toast.LENGTH_LONG).show()
+                        email = ""
+                        password = ""
                     }
                 }
             }
         }
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable

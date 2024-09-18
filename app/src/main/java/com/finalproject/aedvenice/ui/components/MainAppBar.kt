@@ -144,8 +144,8 @@ fun DefinitionsMenu(expanded: Boolean, onDismiss: () -> Unit, navController: Nav
                 }) {
                 Text("Log Out")
             }
-            Divider(color = Color.DarkGray)
             if(signInViewModel.isUserRemovable()){
+                Divider(color = Color.DarkGray)
                 DropdownMenuItem(
                     onClick = {
                         openAlertDialog.value = true

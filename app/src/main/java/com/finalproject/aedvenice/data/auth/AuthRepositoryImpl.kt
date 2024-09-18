@@ -2,6 +2,7 @@ package com.finalproject.aedvenice.data.auth
 
 import com.finalproject.aedvenice.utils.Resource
 import com.google.firebase.auth.AuthResult
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -47,8 +48,20 @@ class AuthRepositoryImpl @Inject constructor(
             firebaseAuth.currentUser?.delete()
     }
 
-    override fun updatePassword(password: String) {
-        val result = firebaseAuth.currentUser?.updatePassword(password) //TODO: check original password
+    override fun updatePassword(password: String, currentPwd: String): Boolean {
+        var result = true
+        //Reauthenticate user
+        val user = FirebaseAuth.getInstance().currentUser
+        val email = user?.email ?: return false
+        val credentials = EmailAuthProvider.getCredential(email, currentPwd)
+        user.reauthenticate(credentials)
+            .addOnSuccessListener {
+                firebaseAuth.currentUser!!.updatePassword(password)
+                    .addOnCompleteListener { task ->
+                        result = task.isSuccessful
+                    }
+            }
+        return result
     }
 
     override fun isUserRemovable(): Boolean {

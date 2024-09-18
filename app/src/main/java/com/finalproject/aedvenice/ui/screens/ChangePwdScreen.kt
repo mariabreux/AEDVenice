@@ -15,7 +15,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,11 +31,9 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.finalproject.aedvenice.data.ViewModel
 import com.finalproject.aedvenice.data.auth.presentation.SignInViewModel
 import com.finalproject.aedvenice.ui.theme.BorderPink
 import com.finalproject.aedvenice.ui.theme.DarkPink
-import kotlinx.coroutines.launch
 
 @Composable
 fun ChangePwdScreen(
@@ -123,8 +120,24 @@ fun ChangePwdScreen(
                 ),
                 border = BorderStroke(2.dp, BorderPink),
                 onClick = {
-                    viewModel.updatePassword(newPwd)
-
+                    if(newPwd != "" || confirmPwd != "" || currentPwd != ""){
+                        if(newPwd == confirmPwd){
+                            val result = viewModel.updatePassword(newPwd, currentPwd)
+                            if(result){
+                                Toast.makeText(context, "Password updated successfully", Toast.LENGTH_LONG).show()
+                                navController.navigate("Manage Aed")
+                            }
+                            else{
+                                Toast.makeText(context, "Error updating password", Toast.LENGTH_LONG).show()
+                            }
+                        }
+                        else{
+                            Toast.makeText(context, "The passwords do not match!", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                    else{
+                        Toast.makeText(context, "All fields must be filled", Toast.LENGTH_LONG).show()
+                    }
                 }
             ) {
                 Text(
@@ -133,8 +146,6 @@ fun ChangePwdScreen(
                     style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
                 )
             }
-
-
         }
     }
 }

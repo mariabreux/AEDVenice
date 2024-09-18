@@ -12,7 +12,7 @@ fun Test(viewModel : SignInViewModel = hiltViewModel()) {
         Text(text = "Delete Account")
     }
     
-    Button(onClick = { viewModel.updatePassword("teste123") }) {
+    Button(onClick = { /*viewModel.updatePassword("teste123") */}) {
         Text(text = "Update password to teste123")
     }
 }

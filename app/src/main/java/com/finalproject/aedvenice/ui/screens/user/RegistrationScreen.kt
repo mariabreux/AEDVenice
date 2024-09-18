@@ -48,7 +48,6 @@ fun RegistrationScreen(
     aedViewModel: ViewModel,
     viewModel: SignUpViewModel = hiltViewModel()
 ) {
-    Log.i("TAG", "1")
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     val scope = rememberCoroutineScope()
@@ -127,6 +126,7 @@ fun RegistrationScreen(
                         val success = state.value?.isSuccess
                         Toast.makeText(context, "$success", Toast.LENGTH_LONG).show()
                         aedViewModel.adminMode.value = true
+                        navController.navigate("Manage Users")
                     }
                 }
             }

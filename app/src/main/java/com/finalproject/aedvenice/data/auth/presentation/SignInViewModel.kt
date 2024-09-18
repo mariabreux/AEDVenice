@@ -37,16 +37,12 @@ class SignInViewModel @Inject constructor(
         repository.logoutUser()
     }
 
-    fun isUserLoggedIn() : Boolean{
-        return repository.isUserLoggedIn()
-    }
-
     fun removeUser(){
         repository.removeUser()
     }
 
-    fun updatePassword(password: String){
-        repository.updatePassword(password)
+    fun updatePassword(password: String, currentPwd: String) : Boolean{
+        return repository.updatePassword(password, currentPwd)
     }
 
     fun isUserRemovable() : Boolean{

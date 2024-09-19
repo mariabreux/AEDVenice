@@ -128,6 +128,14 @@ fun DefinitionsMenu(expanded: Boolean, onDismiss: () -> Unit, navController: Nav
                 .border(BorderStroke(1.dp, Color.DarkGray), RoundedCornerShape(4.dp))
         ) {
             DropdownMenuItem(onClick = {
+                navController.navigate("Registration")
+                onDismiss()
+            })
+            {
+                Text("Add User")
+            }
+            Divider(color = Color.DarkGray)
+            DropdownMenuItem(onClick = {
                 navController.navigate("Change Password")
                 onDismiss()
             })

@@ -30,7 +30,7 @@ val navBarItems: Map<String, Int> = mapOf(
 
 val navBarItemsAdmin: Map<String, Int> = mapOf(
     "Manage Aed" to R.drawable.home,
-    "Manage Users" to R.drawable.groups,
+    //"Manage Users" to R.drawable.groups,
     "Manage Report" to R.drawable.report,
     "Definitions" to R.drawable.more_vert
 

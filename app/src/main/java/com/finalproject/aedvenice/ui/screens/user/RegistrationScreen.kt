@@ -64,6 +64,17 @@ fun RegistrationScreen(
             modifier = Modifier
                 .padding(54.dp)
         ) {
+            Row(
+                modifier = Modifier
+                    .padding(top = 20.dp)
+                    .fillMaxWidth()
+            ){
+                Text(
+                    text = "New User",
+                    style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.SemiBold),
+                )
+            }
+            Spacer(modifier = Modifier.padding(12.dp))
             Text(
                 text = "Email:",
                 style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),

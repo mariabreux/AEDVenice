@@ -359,20 +359,20 @@ fun SplitService(
             Row{
                 OutlinedTextField(
                     value = start,
-                    onValueChange = { start = it },
+                    onValueChange = { },
                      modifier = Modifier.weight(1f),
                     textStyle = MaterialTheme.typography.displaySmall.copy(
                         fontWeight = FontWeight.Normal,
                         fontSize = 20.sp
                     ),
-                    placeholder = {
-                        Text(
-                            text = "From:",
-                            style = MaterialTheme.typography.displaySmall.copy(
-                                fontSize = 15.sp,
-                            )
-                        )
-                    }
+//                    placeholder = {
+//                        Text(
+//                            text = "From:",
+//                            style = MaterialTheme.typography.displaySmall.copy(
+//                                fontSize = 15.sp,
+//                            )
+//                        )
+//                    }
 
                 )
                 Spacer(modifier = Modifier.padding(10.dp))
@@ -418,20 +418,20 @@ fun SplitService(
                 Spacer(modifier = Modifier.padding(10.dp))
                 OutlinedTextField(
                     value = end,
-                    onValueChange = { end = it },
+                    onValueChange = { },
                     modifier = Modifier.weight(1f),
                     textStyle = MaterialTheme.typography.displaySmall.copy(
                         fontWeight = FontWeight.Normal,
                         fontSize = 20.sp
                     ),
-                    placeholder = {
-                        Text(
-                            text = "To:",
-                            style = MaterialTheme.typography.displaySmall.copy(
-                                fontSize = 15.sp,
-                            )
-                        )
-                    }
+//                    placeholder = {
+//                        Text(
+//                            text = "To:",
+//                            style = MaterialTheme.typography.displaySmall.copy(
+//                                fontSize = 15.sp,
+//                            )
+//                        )
+//                    }
                 )
             }
 

@@ -80,16 +80,16 @@ class FirebaseManager(){
                     val id = document.id
                     val address = document.getString("indirizzo")
                     val notes = document.getString("note")
-                    val geoPoint = document.get("geo_point") as Map<String, Double>
+                    val geoPoint = document.get("geo_point") as? Map<String, Double>
                     val basics = AedBasics(
-                        id, address, GeoPoint(geoPoint["latitude"], geoPoint["longitude"]), notes
+                        id, address, GeoPoint(geoPoint?.get("latitude"), geoPoint?.get("longitude")), notes
                         /*TODO: change to lat and long after changing the collection to aed */
                     )
                     val name = document.getString("nome")
                     val city = document.getString("citta")
                     val location = document.getString("ubicazione")
                     val timetable = document.getString("orari")
-                    val phoneNumber = document.get("telefono") as List<String>
+                    val phoneNumber = document.get("telefono") as? List<String>
                     val aed = Aed(
                         basics, name, city, location, timetable, phoneNumber
                     )

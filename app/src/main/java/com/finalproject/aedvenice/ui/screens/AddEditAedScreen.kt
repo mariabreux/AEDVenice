@@ -1,6 +1,7 @@
 package com.finalproject.aedvenice.ui.screens
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -19,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -28,16 +30,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.finalproject.aedvenice.R
+import com.finalproject.aedvenice.data.ViewModel
+import com.finalproject.aedvenice.data.aed.Aed
+import com.finalproject.aedvenice.data.aed.AedBasics
+import com.finalproject.aedvenice.data.aed.GeoPoint
 import com.finalproject.aedvenice.ui.theme.DarkPink
 
 @Composable
-fun AddEditAedScreen(navController: NavHostController) {
+fun AddEditAedScreen(viewModel: ViewModel, navController: NavHostController) {
     var name by remember { mutableStateOf("") }
+    var address by remember { mutableStateOf("") }
+    var city by remember { mutableStateOf("") }
+    var note by remember { mutableStateOf("") }
+    var location by remember { mutableStateOf("") }
+    var coordinates by remember { mutableStateOf(GeoPoint()) }
+    var telephone by remember { mutableStateOf("") } //TODO: Later change to telephone list?
     var showDays = remember { mutableStateOf(false) }
     val days = arrayOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
     var selectedDay = remember { mutableStateOf(days[0]) }
+    val context = LocalContext.current
 
     LazyColumn(
         modifier = Modifier
@@ -70,7 +82,30 @@ fun AddEditAedScreen(navController: NavHostController) {
                     modifier = Modifier.padding(top = 40.dp)
                 ) {
                     IconButton(
-                        onClick = { /* TODO: save info */ },
+                        onClick = {
+                            val newAed = Aed(
+                                AedBasics(
+                                    null,
+                                    address,
+                                    coordinates,
+                                    note),
+                                name,
+                                city,
+                                location,
+                                "Monday: 2-4", //TODO: pass timetable
+                                listOf("123", "456") //TODO: pass telephone
+                            )
+                            viewModel.createAed(
+                                newAed,
+                                onSuccess = {
+                                    Toast.makeText(context, "Aed created successfully", Toast.LENGTH_LONG).show()
+                                },
+                                onFailure = {
+                                    Toast.makeText(context, "Error creating new Aed", Toast.LENGTH_LONG).show()
+                                }
+                            )
+                            navController.navigate("Manage Aed")
+                        },
                         modifier = Modifier.size(47.dp)
                     ) {
                         Icon(
@@ -84,14 +119,14 @@ fun AddEditAedScreen(navController: NavHostController) {
         }
 
         item { Spacer(modifier = Modifier.padding(15.dp)) }
-        item { formAED(text = "Name", tfValue = name) }
-        item { formAED(text = "Address", tfValue = name) }
-        item { formAED(text = "Coordinates", tfValue = name) }
-        item { formAED(text = "City", tfValue = name) }
-        item { formAED(text = "Location", tfValue = name) }
-        item { formAED(text = "Telephone", tfValue = name) }
-        item { formAED(text = "Note", tfValue = name) }
-        item { formAED(text = "Timetable", tfValue = "") }
+        item { name = formAEDString(text = "Name", tfValue = name) }
+        item { address = formAEDString(text = "Address", tfValue = address) }
+        item { coordinates = formAEDGeo(text = "Coordinates") }
+        item { city = formAEDString(text = "City", tfValue = city) }
+        item { location = formAEDString(text = "Location", tfValue = location) }
+        item { telephone = formAEDString(text = "Telephone", tfValue = telephone) }
+        item { note = formAEDString(text = "Note", tfValue = note) }
+        item { FormAED(text = "Timetable") }
         item { Spacer(modifier = Modifier.padding(10.dp)) }
         item { Timetable() }
     }
@@ -99,107 +134,120 @@ fun AddEditAedScreen(navController: NavHostController) {
 
 @SuppressLint("Range")
 @Composable
-fun formAED(text: String, tfValue: String, xValue: String = " ", yValue: String = " ") {
-    when (text) {
-        "Coordinates" -> {
+fun FormAED(text: String) {
+    Row {
+        Column(modifier = Modifier.padding(10.dp)) {
+            Text(
+                text = "$text:",
+                style = MaterialTheme.typography.displaySmall.copy(
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 25.sp
+                )
+            )
+        }
+    }
+}
+
+@SuppressLint("Range")
+@Composable
+fun formAEDString(
+    text: String,
+    tfValue: String,
+) : String {
+    var tf by remember { mutableStateOf(tfValue) }
+
+    Row {
+        Column(modifier = Modifier.padding(10.dp)) {
             Row {
-                Column(modifier = Modifier.padding(10.dp)) {
-                    Row {
-                        Text(
-                            text = "$text:",
-                            style = MaterialTheme.typography.displaySmall.copy(
-                                fontWeight = FontWeight.Normal,
-                                fontSize = 25.sp
-                            )
-                        )
+                Text(
+                    text = "$text:",
+                    style = MaterialTheme.typography.displaySmall.copy(
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 25.sp
+                    )
+                )
 
-                        Icon(
-                            imageVector = ImageVector.vectorResource(id = R.drawable.info),
-                            contentDescription = "info",
-                            tint = Color.Unspecified,
-                            modifier = Modifier
-                                .size(40.dp)
-                                .padding(start = 10.dp)
-                        )
-                    }
-                }
-
-                Column(modifier = Modifier.padding(10.dp)) {
-                    var x by remember { mutableStateOf(xValue) }
-                    var y by remember { mutableStateOf(yValue) }
-
-                    Row {
-                        OutlinedTextField(
-                            value = x,
-                            onValueChange = { x = it },
-                            modifier = Modifier
-                                .height(45.dp)
-                                .weight(1f)
-                        )
-                        Spacer(modifier = Modifier.padding(3.dp))
-                        OutlinedTextField(
-                            value = y,
-                            onValueChange = { y = it },
-                            modifier = Modifier
-                                .height(45.dp)
-                                .weight(1f)
-                        )
-                    }
-                }
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.info),
+                    contentDescription = "info",
+                    tint = Color.Unspecified,
+                    modifier = Modifier
+                        .size(40.dp)
+                        .padding(start = 10.dp)
+                )
             }
         }
 
-        "Timetable" -> {
+        Column(modifier = Modifier.padding(10.dp)) {
+
+            OutlinedTextField(
+                value = tf,
+                onValueChange = { tf = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(45.dp)
+            )
+        }
+    }
+
+    return tf
+}
+
+@SuppressLint("Range")
+@Composable
+fun formAEDGeo(
+    text: String,
+    xValue: String = "",
+    yValue: String = ""
+) : GeoPoint {
+    var x by remember { mutableStateOf(xValue) }
+    var y by remember { mutableStateOf(yValue) }
+
+    Row {
+        Column(modifier = Modifier.padding(10.dp)) {
             Row {
-                Column(modifier = Modifier.padding(10.dp)) {
-                    Text(
-                        text = "$text:",
-                        style = MaterialTheme.typography.displaySmall.copy(
-                            fontWeight = FontWeight.Normal,
-                            fontSize = 25.sp
-                        )
+                Text(
+                    text = "$text:",
+                    style = MaterialTheme.typography.displaySmall.copy(
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 25.sp
                     )
-                }
+                )
+
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.info),
+                    contentDescription = "info",
+                    tint = Color.Unspecified,
+                    modifier = Modifier
+                        .size(40.dp)
+                        .padding(start = 10.dp)
+                )
             }
         }
 
-        else -> {
+        Column(modifier = Modifier.padding(10.dp)) {
+
             Row {
-                Column(modifier = Modifier.padding(10.dp)) {
-                    Row {
-                        Text(
-                            text = "$text:",
-                            style = MaterialTheme.typography.displaySmall.copy(
-                                fontWeight = FontWeight.Normal,
-                                fontSize = 25.sp
-                            )
-                        )
-
-                        Icon(
-                            imageVector = ImageVector.vectorResource(id = R.drawable.info),
-                            contentDescription = "info",
-                            tint = Color.Unspecified,
-                            modifier = Modifier
-                                .size(40.dp)
-                                .padding(start = 10.dp)
-                        )
-                    }
-                }
-
-                Column(modifier = Modifier.padding(10.dp)) {
-                    var tf by remember { mutableStateOf(tfValue) }
-
-                    OutlinedTextField(
-                        value = tf,
-                        onValueChange = { tf = it },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(45.dp)
-                    )
-                }
+                OutlinedTextField(
+                    value = x,
+                    onValueChange = { x = it },
+                    modifier = Modifier
+                        .height(45.dp)
+                        .weight(1f)
+                )
+                Spacer(modifier = Modifier.padding(3.dp))
+                OutlinedTextField(
+                    value = y,
+                    onValueChange = { y = it },
+                    modifier = Modifier
+                        .height(45.dp)
+                        .weight(1f)
+                )
             }
         }
     }
+
+    return GeoPoint(x.toDoubleOrNull(), y.toDoubleOrNull())
 }
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -445,5 +493,5 @@ fun SplitService(
 @Preview(showBackground = true)
 @Composable
 fun AddEditAedScreenPreview() {
-    AddEditAedScreen(rememberNavController())
+    //AddEditAedScreen(rememberNavController())
 }

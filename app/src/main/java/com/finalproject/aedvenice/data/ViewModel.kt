@@ -41,8 +41,8 @@ class ViewModel @Inject constructor(): ViewModel() {
         }
     }
 
-    fun createAed(/*TODO: receive aed data, */onSuccess: () -> Unit, onFailure: () -> Unit){
-        val new = Aed(
+    fun createAed(newAed: Aed,/*TODO: receive aed data, */onSuccess: () -> Unit, onFailure: () -> Unit){
+        /*val new = Aed(
             AedBasics(
                 null,
                 "via dorsoduro",
@@ -54,8 +54,8 @@ class ViewModel @Inject constructor(): ViewModel() {
             "inside",
             "Monday: 2-4",
             listOf("123", "456")
-        )
-        firebaseManager.createAed(new, onSuccess, onFailure)
+        )*/
+        firebaseManager.createAed(newAed, onSuccess, onFailure)
     }
 
     fun getAedById(id : String) : MutableLiveData<Aed?>{

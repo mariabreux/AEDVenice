@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -47,11 +48,12 @@ object NavigationUtils{
 
 @Composable
 fun NavigationGraph(navController: NavHostController, viewModel: ViewModel){
+    val context = LocalContext.current
 
     NavHost(navController = navController, startDestination = "Manage Report") {
         composable("Home"){ HomeScreen(navController, viewModel) }
         composable("Manage Aed"){ ManageAedScreen(viewModel, navController) }
-        composable("How To Act"){ HowToActScreen(navController) }
+        composable("How To Act"){ HowToActScreen(context, navController) }
         composable("User Login"){LoginScreen(navController, viewModel)}
         composable("Report/{id}"){ backStackEntry ->
             // Retrieve the ID from the route

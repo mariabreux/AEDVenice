@@ -1,7 +1,9 @@
 package com.finalproject.aedvenice.data
 
+import android.telephony.TelephonyManager
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.finalproject.aedvenice.data.aed.Aed
 import com.finalproject.aedvenice.data.aed.AedBasics
 import com.finalproject.aedvenice.data.aed.GeoPoint
@@ -71,6 +73,10 @@ class FirebaseManager(){
 
     fun getAedById(id: String): MutableLiveData<Aed?> {
         val aedLiveData = MutableLiveData<Aed?>()
+
+        if(id.isEmpty()){
+            return aedLiveData
+        }
 
         db.collection("aedTest")/*TODO: change to Aed*/
             .document(id)
@@ -157,13 +163,15 @@ class FirebaseManager(){
         id : String,
         coordinates : GeoPoint,
         message : String,
+        uuid: String,
         onSuccess: () -> Unit,
         onFailure: () -> Unit
     ){
         val newReport = hashMapOf(
             "aed" to id,
             "coordinates" to coordinates,
-            "message" to message
+            "message" to message,
+            "uuid" to uuid
         )
 
         db.collection("report")
@@ -186,7 +194,7 @@ class FirebaseManager(){
             .document(id)
             .delete()
             .addOnSuccessListener {
-                Log.d("Delete Report", "Report deleted")
+                Log.d("Delete Report", "Report deleted $id")
                 onSuccess()
             }
             .addOnFailureListener { e ->
@@ -202,13 +210,15 @@ class FirebaseManager(){
             .get()
             .addOnSuccessListener { result ->
                 for (document in result) {
+                    val reportId = document.id
                     val reportAed = document.getString("aed")
                     val reportMessage = document.getString("message")
                     val geoPoint = document.get("coordinates") as Map<String, Double>
+                    val uuid = document.getString("uuid")
 
                     reportAed?.let { Log.e("AED id", it) }
 
-                    val rep = Report(reportAed, GeoPoint(geoPoint["latitude"], geoPoint["longitude"]), reportMessage)
+                    val rep = Report(reportId, reportAed, GeoPoint(geoPoint["latitude"], geoPoint["longitude"]), reportMessage, uuid)
                     reports.add(rep)
                     Log.e("Report Size in for", reports.size.toString())
                 }

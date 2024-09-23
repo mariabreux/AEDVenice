@@ -53,7 +53,13 @@ fun NavigationGraph(navController: NavHostController, viewModel: ViewModel){
         composable("Manage Aed"){ ManageAedScreen(viewModel, navController) }
         composable("How To Act"){ HowToActScreen(navController) }
         composable("User Login"){LoginScreen(navController, viewModel)}
-        composable("Report"){ ReportProblemScreen(navController, viewModel) }
+        composable("Report/{id}"){ backStackEntry ->
+            // Retrieve the ID from the route
+            val id = backStackEntry.arguments?.getString("id")
+            if (id != null)
+                ReportProblemScreen(navController, viewModel, id)
+            //ReportProblemScreen(navController, viewModel)
+        }
         composable("Registration"){ RegistrationScreen(navController, viewModel) }
         composable("Manage Report"){ ManageReportScreen(viewModel)}
         composable("Manage Users"){ ManageUsersScreen(viewModel, navController)}

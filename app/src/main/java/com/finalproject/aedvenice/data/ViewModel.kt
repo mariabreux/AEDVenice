@@ -1,12 +1,12 @@
 package com.finalproject.aedvenice.data
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.SharedPreferences
 import android.graphics.Color
-import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.finalproject.aedvenice.data.aed.Aed
@@ -16,11 +16,35 @@ import com.finalproject.aedvenice.data.aed.Report
 import com.finalproject.aedvenice.maps.MapState
 import com.google.android.gms.location.FusedLocationProviderClient
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.util.UUID
 import javax.inject.Inject
 
 
 @HiltViewModel
 class ViewModel @Inject constructor(): ViewModel() {
+    /*UUID*/
+    private fun generateUUID(): String{
+        return UUID.randomUUID().toString()
+    }
+
+    fun getUUID(context: Context): String{
+        //To allow the UUID to persist through multiple app sessions
+        val sharedPreferences: SharedPreferences = context.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+        val storedUUID = sharedPreferences.getString("uuid", null)
+
+        if(storedUUID == null){ // if there is not yet an UUID generated
+            val newUUID = generateUUID()
+            //store the created uuid in sharedPreferences
+            with(sharedPreferences.edit()){
+                putString("uuid", newUUID)
+                apply()
+            }
+            return newUUID
+        } else{
+            return storedUUID
+        }
+    }
+
     /*AEDs*/
 
     private val firebaseManager = FirebaseManager()
@@ -42,19 +66,6 @@ class ViewModel @Inject constructor(): ViewModel() {
     }
 
     fun createAed(newAed: Aed,/*TODO: receive aed data, */onSuccess: () -> Unit, onFailure: () -> Unit){
-        /*val new = Aed(
-            AedBasics(
-                null,
-                "via dorsoduro",
-                GeoPoint(45.4785,
-                    12.2533),
-                "functioning"),
-            "second aed",
-            "venice",
-            "inside",
-            "Monday: 2-4",
-            listOf("123", "456")
-        )*/
         firebaseManager.createAed(newAed, onSuccess, onFailure)
     }
 
@@ -86,8 +97,8 @@ class ViewModel @Inject constructor(): ViewModel() {
     }
 
     /*REPORTS*/
-    fun createReport(id : String, coordinates : GeoPoint, message : String, onSuccess: () -> Unit, onFailure: () -> Unit){
-        firebaseManager.createReport(id, coordinates, message, onSuccess, onFailure)
+    fun createReport(context: Context, id : String, coordinates : GeoPoint, message : String, onSuccess: () -> Unit, onFailure: () -> Unit){
+        firebaseManager.createReport(id, coordinates, message, getUUID(context), onSuccess, onFailure)
     }
 
     fun deleteReport(id : String, onSuccess: () -> Unit, onFailure: () -> Unit){

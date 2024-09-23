@@ -79,7 +79,7 @@ fun HomeScreen(navController: NavHostController, viewModel: ViewModel) {
             .padding(16.dp)
             .fillMaxSize()
     ) {
-        MapScreen(state = viewModel.state.value, viewModel)
+        MapScreen(state = viewModel.state.value, viewModel, navController)
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,

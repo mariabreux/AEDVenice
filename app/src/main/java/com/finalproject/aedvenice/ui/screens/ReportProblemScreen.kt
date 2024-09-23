@@ -32,17 +32,13 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.finalproject.aedvenice.data.ViewModel
 import com.finalproject.aedvenice.ui.theme.BorderPink
 import com.finalproject.aedvenice.ui.theme.DarkPink
 
 @Composable
-fun ReportProblemScreen(navController : NavController, viewModel : ViewModel/*TODO: receive Aed Id*/) {
-
-    val id = "HNR2dh19W6xTCirysDVu"
-
+fun ReportProblemScreen(navController : NavController, viewModel : ViewModel, id: String/*TODO: receive Aed Id*/) {
     val aed = viewModel.getAedById(id).observeAsState()
     val context = LocalContext.current
 
@@ -162,6 +158,7 @@ fun ReportProblemScreen(navController : NavController, viewModel : ViewModel/*TO
                     }
                     aed.value?.aedBasics?.geoPoint?.let {
                         viewModel.createReport(
+                            context,
                             id,
                             it,
                             reportMessage,

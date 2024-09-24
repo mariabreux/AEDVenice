@@ -1,10 +1,6 @@
 package com.finalproject.aedvenice.utils
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -12,7 +8,7 @@ import androidx.navigation.compose.composable
 import com.finalproject.aedvenice.R
 import com.finalproject.aedvenice.data.ViewModel
 import com.finalproject.aedvenice.ui.screens.AddEditAedScreen
-import com.finalproject.aedvenice.ui.screens.ChangePwdScreen
+import com.finalproject.aedvenice.ui.screens.user.ChangePwdScreen
 import com.finalproject.aedvenice.ui.screens.HomeScreen
 import com.finalproject.aedvenice.ui.screens.HowToActScreen
 import com.finalproject.aedvenice.ui.screens.user.LoginScreen

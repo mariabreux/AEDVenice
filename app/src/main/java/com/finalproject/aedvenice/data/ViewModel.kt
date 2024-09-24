@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Color
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -15,6 +16,7 @@ import com.finalproject.aedvenice.data.aed.GeoPoint
 import com.finalproject.aedvenice.data.aed.Report
 import com.finalproject.aedvenice.maps.MapState
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.firebase.database.core.Repo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.UUID
 import javax.inject.Inject
@@ -52,7 +54,9 @@ class ViewModel @Inject constructor(): ViewModel() {
     private val _aeds = mutableStateOf<List<AedBasics>>(emptyList())
     val aeds: State<List<AedBasics>> = _aeds
 
-    var report = mutableListOf<Report>()
+    private val _reports = mutableStateOf<List<Report>>(emptyList())
+    val reports: State<List<Report>> = _reports
+    //var report = mutableListOf<Report>()
 
     var adminMode = mutableStateOf(false)
     init {
@@ -105,11 +109,13 @@ class ViewModel @Inject constructor(): ViewModel() {
         firebaseManager.deleteReport(id, onSuccess, onFailure)
     }
 
-    fun getReports() : List<Report>{
-        firebaseManager.getReports { rep -> report = rep.toMutableList() }
-
-
-        return report
+    fun getReports(onUpdate: (List<Report>) -> Unit){
+        firebaseManager.getReports { rep ->
+            _reports.value = rep
+            onUpdate(reports.value)
+            //report = rep.toMutableList()
+            //onUpdate(report)
+        }
     }
 
     /*MAPS*/
@@ -138,7 +144,7 @@ class ViewModel @Inject constructor(): ViewModel() {
                 }
             }
         } catch (e: SecurityException) {
-            // Show error or something
+            Log.e("Get Device Location", "Error getting device location")
         }
     }
 

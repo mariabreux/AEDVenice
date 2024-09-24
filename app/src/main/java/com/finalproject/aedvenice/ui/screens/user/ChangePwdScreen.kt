@@ -1,4 +1,4 @@
-package com.finalproject.aedvenice.ui.screens
+package com.finalproject.aedvenice.ui.screens.user
 
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke

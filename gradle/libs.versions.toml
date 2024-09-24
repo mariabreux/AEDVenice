@@ -13,6 +13,7 @@ googleServices = "4.4.1"
 firebaseFirestore = "24.11.1"
 firebaseAuth = "22.3.1"
 googleGmsGoogleServices = "4.4.1"
+composeMaterial3 = "1.0.0-alpha25"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -33,6 +34,7 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 google-services = { group = "com.google.gms", name = "google-services", version.ref = "googleServices" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
+androidx-compose-material3 = { group = "androidx.wear.compose", name = "compose-material3", version.ref = "composeMaterial3" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

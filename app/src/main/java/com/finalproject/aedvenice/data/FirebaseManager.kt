@@ -205,24 +205,27 @@ class FirebaseManager(){
 
     fun getReports(onUpdate: (List<Report>) -> Unit) {
         val reportsCollection = db.collection("report")
-        val reports = mutableListOf<Report>()
         reportsCollection
-            .get()
-            .addOnSuccessListener { result ->
-                for (document in result) {
-                    val reportId = document.id
-                    val reportAed = document.getString("aed")
-                    val reportMessage = document.getString("message")
-                    val geoPoint = document.get("coordinates") as Map<String, Double>
-                    val uuid = document.getString("uuid")
-
-                    reportAed?.let { Log.e("AED id", it) }
-
-                    val rep = Report(reportId, reportAed, GeoPoint(geoPoint["latitude"], geoPoint["longitude"]), reportMessage, uuid)
-                    reports.add(rep)
-                    Log.e("Report Size in for", reports.size.toString())
+            .addSnapshotListener{ snapshot, e ->
+                if(e != null){
+                    Log.e("Get Reports From Firestore", "Error getting reports")
+                    onUpdate(emptyList())
+                    return@addSnapshotListener
                 }
-                onUpdate(reports)
+                if(snapshot != null){
+                    val reports = mutableListOf<Report>()
+                    for (document in snapshot.documents) {
+                        val reportId = document.id
+                        val reportAed = document.getString("aed")
+                        val reportMessage = document.getString("message")
+                        val geoPoint = document.get("coordinates") as Map<String, Double>
+                        val uuid = document.getString("uuid")
+
+                        val rep = Report(reportId, reportAed, GeoPoint(geoPoint["latitude"], geoPoint["longitude"]), reportMessage, uuid)
+                        reports.add(rep)
+                    }
+                    onUpdate(reports)
+                }
             }
     }
 }

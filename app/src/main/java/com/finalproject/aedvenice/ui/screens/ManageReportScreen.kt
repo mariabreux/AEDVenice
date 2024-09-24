@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -23,7 +24,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -40,23 +43,32 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.finalproject.aedvenice.R
 import com.finalproject.aedvenice.data.ViewModel
+import com.finalproject.aedvenice.data.aed.Aed
 import com.finalproject.aedvenice.data.aed.Report
 import com.finalproject.aedvenice.ui.theme.BorderPink
 import com.finalproject.aedvenice.ui.theme.DarkPink
 import com.finalproject.aedvenice.ui.theme.LightPink
+import com.google.accompanist.placeholder.PlaceholderHighlight
+import com.google.accompanist.placeholder.material.placeholder
+import com.google.accompanist.placeholder.material.shimmer
 
 @Composable
 fun ManageReportScreen(viewModel: ViewModel) {
     var reports by remember { mutableStateOf(emptyList<Report>()) }
-    var address by remember {
-        mutableStateOf("")
-    }
+    var isLoading by remember { mutableStateOf(true) }
+    var aedId by remember { mutableStateOf<String?>("") }
+    val aedState by viewModel.getAedById(aedId ?: "").observeAsState(initial = null)
 
-    reports = viewModel.getReports()
+    LaunchedEffect(Unit) {
+        viewModel.getReports{ reps ->
+            reports = reps
+            isLoading = false
+        }
+    }
 
     var showDialog by remember { mutableStateOf(false) }
     val onDismiss = { showDialog = false }
-    val onConfirm = { }
+    val onConfirm = { } /*TODO: Remove*/
     var selectedReport by remember { mutableStateOf<Report?>(null) }
 
     Column(
@@ -78,7 +90,11 @@ fun ManageReportScreen(viewModel: ViewModel) {
             Spacer(modifier = Modifier.weight(1f))
 
             IconButton(onClick = {
-                reports = viewModel.getReports()
+                isLoading = true
+                viewModel.getReports{ reps ->
+                    reports = reps
+                    isLoading = false
+                }
 
             }) {
                 Icon(
@@ -91,7 +107,6 @@ fun ManageReportScreen(viewModel: ViewModel) {
             }
         }
 
-
         Spacer(modifier = Modifier.padding(30.dp))
 
         Column {
@@ -101,64 +116,61 @@ fun ManageReportScreen(viewModel: ViewModel) {
             ) {
                 Text(text = "Address", modifier = Modifier.weight(1f))
             }
+            if(isLoading){
+                ShimmerEffect()
+            } else{
+                Spacer(modifier = Modifier.padding(15.dp))
 
-            Spacer(modifier = Modifier.padding(15.dp))
+                Column(
+                    modifier = Modifier
+                        .border(BorderStroke(1.dp, Color.LightGray), shape = RoundedCornerShape(5.dp))
+                ) {
+                    reports.forEach { report ->
+                        aedId= report.aedId
+                        Row {
+                            Text(
+                                text = aedState?.aedBasics?.address ?: "", modifier = Modifier /*TODO: Show address or city?*/
+                                    .weight(1f)
+                                    .padding(horizontal = 5.dp)
+                                    .align(Alignment.CenterVertically)
+                            )
 
-            Column(
-                modifier = Modifier
-                    .border(BorderStroke(1.dp, Color.LightGray), shape = RoundedCornerShape(5.dp))
-            ) {
-                reports.forEach { report ->
-                    address =
-                        report.aedId?.let { viewModel.getAedById(it).value?.aedBasics?.address }
-                            .toString()
-                    Row {
-                        Text(
-                            text = address ?: "", modifier = Modifier
-                                .weight(1f)
-                                .padding(horizontal = 5.dp)
-                                .align(Alignment.CenterVertically)
-                        )
+                            Divider(
+                                modifier = Modifier
+                                    .height(50.dp)
+                                    .width(1.dp),
+                                color = Color.LightGray
+                            )
 
-                        Divider(
-                            modifier = Modifier
-                                .height(50.dp)
-                                .width(1.dp),
-                            color = Color.LightGray
-                        )
+                            Text(
+                                text = "More info",
+                                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
+                                color = DarkPink,
+                                textDecoration = TextDecoration.Underline,
 
-                        Text(
-                            text = "More info",
-                            style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
-                            color = DarkPink,
-                            textDecoration = TextDecoration.Underline,
-
-                            modifier = Modifier
-                                .padding(horizontal = 5.dp)
-                                .align(Alignment.CenterVertically)
-                                .clickable {
-                                    selectedReport = report
-                                    showDialog = true
-                                },
-                            textAlign = TextAlign.Center
-                        )
-
-
+                                modifier = Modifier
+                                    .padding(horizontal = 5.dp)
+                                    .align(Alignment.CenterVertically)
+                                    .clickable {
+                                        selectedReport = report
+                                        showDialog = true
+                                    },
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                        Divider()
                     }
-                    Divider()
                 }
-
             }
-
-
         }
     }
     if (showDialog && selectedReport != null) {
         selectedReport?.let {
             MoreInfoScreen(
-                onDismiss = { showDialog = false },
+                onDismiss = { onDismiss() },
                 onConfirm = { onConfirm },
                 it,
+                aedState,
                 viewModel
             )
         }
@@ -168,13 +180,11 @@ fun ManageReportScreen(viewModel: ViewModel) {
 @Composable
 fun MoreInfoScreen(
     onDismiss: () -> Unit,
-    onConfirm: () -> Unit,
+    onConfirm: () -> Unit, /*TODO: Remove*/
     report: Report,
+    aed: Aed?,
     viewModel: ViewModel
 ) {
-    val id = report.aedId
-    val name = id?.let { viewModel.getAedById(it).value?.name }
-
     Dialog(onDismissRequest = onDismiss) {
         Column(
             modifier = Modifier
@@ -205,14 +215,10 @@ fun MoreInfoScreen(
                     .fillMaxWidth()
                     .padding(top = 5.dp)
             ) {
-
-
                 androidx.compose.material.Text(
-                    text = name.toString(),
+                    text = aed?.name.toString(),
                     style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.SemiBold),
                 )
-
-
             }
             Spacer(modifier = Modifier.padding(10.dp))
 
@@ -223,7 +229,7 @@ fun MoreInfoScreen(
                     .padding(horizontal = 25.dp)
             ) {
                 androidx.compose.material.Text(
-                    text = "Address: " + id?.let { viewModel.getAedById(it).value?.aedBasics?.address },
+                    text = "Address: " + aed?.aedBasics?.address,
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold)
                 )
 
@@ -246,7 +252,6 @@ fun MoreInfoScreen(
                     text = "User: " + report.uuid,
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold)
                 )
-
             }
 
             Spacer(modifier = Modifier.height(25.dp))
@@ -267,7 +272,6 @@ fun MoreInfoScreen(
                         })
                     }
                     onDismiss()
-                    /*TODO: delete report*/
                 }
             ) {
                 androidx.compose.material.Text(
@@ -276,9 +280,35 @@ fun MoreInfoScreen(
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
                 )
             }
-
         }
-
     }
+}
 
+@Composable
+fun ShimmerEffect(){
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        repeat(4){
+            ShimmerPlaceholder()
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+    }
+}
+
+@Composable
+fun ShimmerPlaceholder(){
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(50.dp)
+            .placeholder(
+                visible = true,
+                highlight = PlaceholderHighlight.shimmer(),
+                color = Color.Gray,
+                shape = RoundedCornerShape(4.dp)
+            )
+    )
 }

@@ -94,4 +94,7 @@ dependencies {
     implementation ("com.google.firebase:firebase-auth-ktx:23.0.0")
     implementation(libs.firebase.firestore)
 
+    //Shimmer Effect
+    implementation("com.google.accompanist:accompanist-placeholder-material:0.36.0")
+
 }

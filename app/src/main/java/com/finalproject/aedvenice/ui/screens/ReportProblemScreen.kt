@@ -142,7 +142,6 @@ fun ReportProblemScreen(navController : NavController, viewModel : ViewModel, id
                 .fillMaxWidth()
                 .padding(27.dp)
         ) {
-
             Button(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -185,6 +184,7 @@ fun ReportProblemScreen(navController : NavController, viewModel : ViewModel, id
 
             }
             Spacer(modifier = Modifier.padding(3.dp))
+
             Text(
                 text = "Cancel",
                 style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
@@ -201,7 +201,6 @@ fun ReportProblemScreen(navController : NavController, viewModel : ViewModel, id
         }
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable

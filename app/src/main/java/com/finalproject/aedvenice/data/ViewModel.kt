@@ -12,11 +12,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.finalproject.aedvenice.data.aed.Aed
 import com.finalproject.aedvenice.data.aed.AedBasics
+import com.finalproject.aedvenice.data.aed.BannedUser
 import com.finalproject.aedvenice.data.aed.GeoPoint
 import com.finalproject.aedvenice.data.aed.Report
 import com.finalproject.aedvenice.maps.MapState
 import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.firebase.database.core.Repo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.UUID
 import javax.inject.Inject
@@ -55,8 +55,10 @@ class ViewModel @Inject constructor(): ViewModel() {
     val aeds: State<List<AedBasics>> = _aeds
 
     private val _reports = mutableStateOf<List<Report>>(emptyList())
-    val reports: State<List<Report>> = _reports
-    //var report = mutableListOf<Report>()
+    private val reports: State<List<Report>> = _reports
+
+    private val _bannedUsers = mutableStateOf<List<BannedUser>>(emptyList())
+    val bannedUsers: State<List<BannedUser>> = _bannedUsers
 
     var adminMode = mutableStateOf(false)
     init {
@@ -69,7 +71,7 @@ class ViewModel @Inject constructor(): ViewModel() {
         }
     }
 
-    fun createAed(newAed: Aed,/*TODO: receive aed data, */onSuccess: () -> Unit, onFailure: () -> Unit){
+    fun createAed(newAed: Aed, onSuccess: () -> Unit, onFailure: () -> Unit){
         firebaseManager.createAed(newAed, onSuccess, onFailure)
     }
 
@@ -82,7 +84,7 @@ class ViewModel @Inject constructor(): ViewModel() {
         getAedBasicsList()
     }
 
-    fun updateAed(id : String, aed : Aed /*TODO: receive aed data*/, onSuccess: () -> Unit, onFailure: () -> Unit){
+    fun updateAed(id : String, aed : Aed, onSuccess: () -> Unit, onFailure: () -> Unit){
         val update = Aed(
             AedBasics(
                 null,
@@ -113,8 +115,18 @@ class ViewModel @Inject constructor(): ViewModel() {
         firebaseManager.getReports { rep ->
             _reports.value = rep
             onUpdate(reports.value)
-            //report = rep.toMutableList()
-            //onUpdate(report)
+        }
+    }
+
+    /*USERS*/
+    fun banUser(uuid: String, onSuccess: () -> Unit, onFailure: () -> Unit){
+        firebaseManager.banUser(uuid, onSuccess, onFailure)
+    }
+
+    fun getBannedUsers(onUpdate: (List<BannedUser>) -> Unit){
+        firebaseManager.getBannedUsers { bU ->
+            _bannedUsers.value = bU
+            onUpdate(bannedUsers.value)
         }
     }
 

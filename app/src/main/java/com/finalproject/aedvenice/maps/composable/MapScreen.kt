@@ -1,6 +1,7 @@
 package com.finalproject.aedvenice.maps.composable
 
 import android.location.Location
+import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.AlertDialog
@@ -15,9 +16,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import com.finalproject.aedvenice.data.ViewModel
 import com.finalproject.aedvenice.data.aed.Aed
+import com.finalproject.aedvenice.data.aed.BannedUser
 import com.finalproject.aedvenice.maps.MapState
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLng
@@ -38,6 +41,21 @@ fun MapScreen(
     val showDialog = remember { mutableStateOf(false) }
     var aedId by remember { mutableStateOf<String?>("") }
     val aedState by viewModel.getAedById(aedId ?: "").observeAsState(initial = null)
+    var bannedUsers by remember { mutableStateOf(emptyList<BannedUser>()) }
+    var isUserBanned by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(true) }
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.getBannedUsers { bU ->
+            bannedUsers = bU
+            val currentUser = BannedUser(viewModel.getUUID(context))
+            if (bannedUsers.contains(currentUser)) {
+                isUserBanned = true
+            }
+            isLoading = false
+        }
+    }
 
     // Set properties using MapProperties to recompose the map
     val mapProperties = MapProperties(
@@ -52,10 +70,10 @@ fun MapScreen(
     else
         loc = state.lastKnownLocation
     val cameraPositionState = rememberCameraPositionState()
+
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-
         LaunchedEffect(key1 = loc) {
             cameraPositionState.centerOnLocation(loc)
         }
@@ -70,16 +88,20 @@ fun MapScreen(
                     MarkerInfoWindow(
                         state = rememberMarkerState(position = LatLng(i.geoPoint.latitude, i.geoPoint.longitude)),
                         onClick = {
-                            i.id?.let {it1 ->
-                                aedId = it1
-                                showDialog.value = true
+                            if(isLoading){
+                                Toast.makeText(context, "Loading. Please wait...", Toast.LENGTH_SHORT).show()
+                            }
+                            else{
+                                i.id?.let {it1 ->
+                                    aedId = it1
+                                    showDialog.value = true
+                                }
                             }
                             false
                         },
                         draggable = true
                     )
                 }
-
             }
         }
     }
@@ -89,10 +111,10 @@ fun MapScreen(
             MyDialog(
                 aedState,
                 aedId,
-                viewModel,
                 onDismiss = { },
                 navController = navController,
-                showDialog = showDialog
+                showDialog = showDialog,
+                showButton = !isUserBanned,
             )
         }
     }
@@ -102,10 +124,10 @@ fun MapScreen(
 fun MyDialog(
     aed: Aed?,
     aedId: String?,
-    viewModel: ViewModel,
     navController : NavController,
     showDialog: MutableState<Boolean>,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    showButton: Boolean,
 ) {
     AlertDialog(
         onDismissRequest = {
@@ -114,21 +136,21 @@ fun MyDialog(
         },
         text = {
             Text(
-                "AED: " + aed?.name//.value?.name
+                "AED: " + aed?.name
             )
         },
         confirmButton = {
-            TextButton(
-                onClick = {
-                    /*TODO*/
-                    if(aedId != null)
-                        navController.navigate("Report/$aedId")
-                    showDialog.value = false
-                    onDismiss()
+            if(showButton){ //The button "Report problem" is only shown if the user is not banned, and so, he can report
+                TextButton(
+                    onClick = {
+                        if(aedId != null)
+                            navController.navigate("Report/$aedId")
+                        showDialog.value = false
+                        onDismiss()
+                    }
+                ) {
+                    Text("Report Problem")
                 }
-            ) {
-                /*TODO*/
-                Text("Report Problem:")
             }
         },
         dismissButton = {

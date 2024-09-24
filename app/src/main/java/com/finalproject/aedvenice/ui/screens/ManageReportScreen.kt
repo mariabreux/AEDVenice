@@ -168,7 +168,7 @@ fun ManageReportScreen(viewModel: ViewModel) {
         selectedReport?.let {
             MoreInfoScreen(
                 onDismiss = { onDismiss() },
-                onConfirm = { onConfirm },
+                onConfirm = { onConfirm() },
                 it,
                 aedState,
                 viewModel
@@ -255,6 +255,38 @@ fun MoreInfoScreen(
             }
 
             Spacer(modifier = Modifier.height(25.dp))
+
+
+            androidx.compose.material3.Button(modifier = Modifier /*TODO: Adapt button*/
+                .fillMaxWidth()
+                .padding(horizontal = 40.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = DarkPink,
+                ),
+                border = BorderStroke(2.dp, BorderPink),
+                onClick = {
+                    report.uuid?.let {
+                        viewModel.banUser(
+                            report.uuid!!,
+                            {
+                                Log.d("Ban User", "User banned")
+                            },
+                            {
+                                Log.e("Ban User", "Error banning user")
+                            })
+                    }
+                    onDismiss()
+                }
+            ) {
+                androidx.compose.material.Text(
+                    text = "Ban User",
+                    color = Color.White,
+                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
+                )
+            }
+
+
+
 
             androidx.compose.material3.Button(modifier = Modifier
                 .fillMaxWidth()

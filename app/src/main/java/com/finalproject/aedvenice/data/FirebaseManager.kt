@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.finalproject.aedvenice.data.aed.Aed
 import com.finalproject.aedvenice.data.aed.AedBasics
+import com.finalproject.aedvenice.data.aed.BannedUser
 import com.finalproject.aedvenice.data.aed.GeoPoint
 import com.finalproject.aedvenice.data.aed.Report
 import com.google.firebase.Firebase
@@ -228,4 +229,43 @@ class FirebaseManager(){
                 }
             }
     }
+
+    fun banUser(uuid: String, onSuccess: () -> Unit, onFailure: () -> Unit){
+        val bannedUser = hashMapOf(
+            "uuid" to uuid
+        )
+        db.collection("bannedUsers")
+            .add(bannedUser)
+            .addOnSuccessListener {
+                Log.d("Banning User", "User banned successfully")
+                onSuccess()
+            }
+            .addOnFailureListener {
+                Log.d("Banning User", "Error banning user")
+                onFailure()
+            }
+    }
+
+    fun getBannedUsers(onUpdate: (List<BannedUser>) -> Unit){
+        val bannedUserCollection = db.collection("bannedUsers")
+        bannedUserCollection
+            .addSnapshotListener{ snapshot, e ->
+                if(e != null){
+                    Log.e("Get Banned Users From Firestore", "Error getting banned Users")
+                    onUpdate(emptyList())
+                    return@addSnapshotListener
+                }
+                if(snapshot != null){
+                    val bannedUsers = mutableListOf<BannedUser>()
+                    for (document in snapshot.documents) {
+                        val uuid = document.getString("uuid")
+
+                        val bU = BannedUser(uuid.toString())
+                        bannedUsers.add(bU)
+                    }
+                    onUpdate(bannedUsers)
+                }
+            }
+    }
+    /*TODO: Create a function that checks if user is banned, using getBannedUsers*/
 }

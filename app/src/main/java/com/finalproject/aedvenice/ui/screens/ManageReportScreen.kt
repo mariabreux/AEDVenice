@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
@@ -60,7 +62,7 @@ fun ManageReportScreen(viewModel: ViewModel) {
     val aedState by viewModel.getAedById(aedId ?: "").observeAsState(initial = null)
 
     LaunchedEffect(Unit) {
-        viewModel.getReports{ reps ->
+        viewModel.getReports { reps ->
             reports = reps
             isLoading = false
         }
@@ -91,7 +93,7 @@ fun ManageReportScreen(viewModel: ViewModel) {
 
             IconButton(onClick = {
                 isLoading = true
-                viewModel.getReports{ reps ->
+                viewModel.getReports { reps ->
                     reports = reps
                     isLoading = false
                 }
@@ -108,62 +110,69 @@ fun ManageReportScreen(viewModel: ViewModel) {
         }
 
         Spacer(modifier = Modifier.padding(30.dp))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Text(text = "Address", modifier = Modifier.weight(1f))
+        }
 
-        Column {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                Text(text = "Address", modifier = Modifier.weight(1f))
-            }
-            if(isLoading){
-                ShimmerEffect()
-            } else{
-                Spacer(modifier = Modifier.padding(15.dp))
-
+        if (isLoading) {
+            ShimmerEffect()
+        } else {
+            Spacer(modifier = Modifier.padding(15.dp))
+        }
+        LazyColumn {
+            items(reports) { report ->
+                aedId = report.aedId
                 Column(
                     modifier = Modifier
-                        .border(BorderStroke(1.dp, Color.LightGray), shape = RoundedCornerShape(5.dp))
+                        .border(
+                            BorderStroke(1.dp, Color.LightGray),
+                            shape = RoundedCornerShape(5.dp)
+                        )
                 ) {
-                    reports.forEach { report ->
-                        aedId= report.aedId
-                        Row {
-                            Text(
-                                text = aedState?.aedBasics?.address ?: "", modifier = Modifier /*TODO: Show address or city?*/
-                                    .weight(1f)
-                                    .padding(horizontal = 5.dp)
-                                    .align(Alignment.CenterVertically)
-                            )
+                    Row {
+                        Text(
+                            text = aedState?.aedBasics?.address ?: "",
+                            modifier = Modifier /*TODO: Show address or city?*/
+                                .weight(1f)
+                                .padding(horizontal = 5.dp)
+                                .align(Alignment.CenterVertically)
+                        )
 
-                            Divider(
-                                modifier = Modifier
-                                    .height(50.dp)
-                                    .width(1.dp),
-                                color = Color.LightGray
-                            )
+                        Divider(
+                            modifier = Modifier
+                                .height(50.dp)
+                                .width(1.dp),
+                            color = Color.LightGray
+                        )
 
-                            Text(
-                                text = "More info",
-                                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
-                                color = DarkPink,
-                                textDecoration = TextDecoration.Underline,
+                        Text(
+                            text = "More info",
+                            style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
+                            color = DarkPink,
+                            textDecoration = TextDecoration.Underline,
 
-                                modifier = Modifier
-                                    .padding(horizontal = 5.dp)
-                                    .align(Alignment.CenterVertically)
-                                    .clickable {
-                                        selectedReport = report
-                                        showDialog = true
-                                    },
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                        Divider()
+                            modifier = Modifier
+                                .padding(horizontal = 5.dp)
+                                .align(Alignment.CenterVertically)
+                                .clickable {
+                                    selectedReport = report
+                                    showDialog = true
+                                },
+                            textAlign = TextAlign.Center
+                        )
                     }
+                    Divider()
                 }
             }
+
+
         }
     }
+
+
     if (showDialog && selectedReport != null) {
         selectedReport?.let {
             MoreInfoScreen(
@@ -189,7 +198,7 @@ fun MoreInfoScreen(
         Column(
             modifier = Modifier
                 .clip(RoundedCornerShape(5.dp))
-                .height(290.dp)
+                .height(360.dp)
                 .width(310.dp)
                 .background(LightPink)
                 .border(2.dp, color = DarkPink, shape = RoundedCornerShape(5.dp)),
@@ -296,12 +305,13 @@ fun MoreInfoScreen(
                 ),
                 border = BorderStroke(2.dp, BorderPink),
                 onClick = {
-                    report.id?.let { viewModel.deleteReport(it,  {
+                    report.id?.let {
+                        viewModel.deleteReport(it, {
                             Log.d("Delete Aed", "Aed deleted")
                         },
-                        {
-                            Log.e("Delete Aed", "Error deleting Aed")
-                        })
+                            {
+                                Log.e("Delete Aed", "Error deleting Aed")
+                            })
                     }
                     onDismiss()
                 }
@@ -317,13 +327,13 @@ fun MoreInfoScreen(
 }
 
 @Composable
-fun ShimmerEffect(){
+fun ShimmerEffect() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        repeat(4){
+        repeat(4) {
             ShimmerPlaceholder()
             Spacer(modifier = Modifier.height(16.dp))
         }
@@ -331,7 +341,7 @@ fun ShimmerEffect(){
 }
 
 @Composable
-fun ShimmerPlaceholder(){
+fun ShimmerPlaceholder() {
     Box(
         modifier = Modifier
             .fillMaxWidth()

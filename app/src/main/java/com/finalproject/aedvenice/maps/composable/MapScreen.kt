@@ -18,10 +18,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.finalproject.aedvenice.data.ViewModel
 import com.finalproject.aedvenice.data.aed.Aed
 import com.finalproject.aedvenice.data.aed.BannedUser
 import com.finalproject.aedvenice.maps.MapState
+import com.finalproject.aedvenice.ui.screens.AedDetailsScreen
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
@@ -35,7 +37,7 @@ import com.google.maps.android.compose.rememberMarkerState
 fun MapScreen(
     state: MapState,
     viewModel: ViewModel,
-    navController : NavController
+    navController : NavHostController
 ) {
     val aedBasics = viewModel.aeds.value
     val showDialog = remember { mutableStateOf(false) }
@@ -108,19 +110,13 @@ fun MapScreen(
 
     if(showDialog.value){
         if(aedId != null){
-            MyDialog(
-                aedState,
-                aedId,
-                onDismiss = { },
-                navController = navController,
-                showDialog = showDialog,
-                showButton = !isUserBanned,
-            )
+
+            AedDetailsScreen(onDismiss = { }, onConfirm = { }, navController, aedState, aedId, showButton = !isUserBanned)
         }
     }
 }
 
-@Composable
+/*@Composable
 fun MyDialog(
     aed: Aed?,
     aedId: String?,
@@ -165,7 +161,7 @@ fun MyDialog(
             }
         }
     )
-}
+}*/
 
 private suspend fun CameraPositionState.centerOnLocation(
     location: Location

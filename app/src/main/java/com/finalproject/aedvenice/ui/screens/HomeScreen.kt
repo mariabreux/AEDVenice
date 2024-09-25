@@ -131,7 +131,7 @@ fun HomeScreen(navController: NavHostController, viewModel: ViewModel) {
 
     }
     if (showDialog) {
-        AedDetailsScreen(onDismiss = onDismiss, onConfirm = onConfirm, navController)
+        //AedDetailsScreen(onDismiss = onDismiss, onConfirm = onConfirm, navController)
     }
 
     //TODO: search and select an aed to show details

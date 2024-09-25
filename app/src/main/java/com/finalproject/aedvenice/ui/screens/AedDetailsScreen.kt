@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -37,17 +39,32 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.finalproject.aedvenice.data.ViewModel
+import com.finalproject.aedvenice.data.aed.Aed
 import com.finalproject.aedvenice.ui.theme.BorderPink
 import com.finalproject.aedvenice.ui.theme.DarkPink
 import com.finalproject.aedvenice.ui.theme.LightPink
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+
+fun parseTimetable(json: String): Map<String, String> {
+    val gson = Gson()
+    val mapType = object : TypeToken<Map<String, String>>() {}.type
+    return gson.fromJson(json, mapType)
+}
+
 
 @Composable
 fun AedDetailsScreen(
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
-    navController: NavHostController
+    navController: NavHostController,
+    aed: Aed?,
+    aedId: String?,
+    showButton: Boolean
 ) {
 
+    val scheduleMap = aed?.timetable?.trimIndent()?.let { parseTimetable(it) }
     Dialog(onDismissRequest = onDismiss) {
         Column(
             modifier = Modifier
@@ -66,7 +83,7 @@ fun AedDetailsScreen(
                     .padding(top = 16.dp)
             ) {
                 Text(
-                    text = "Name of the building",
+                    text = "AED: " + aed?.name,
                     style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold),
                 )
 
@@ -80,7 +97,7 @@ fun AedDetailsScreen(
                     .padding(horizontal = 25.dp)
             ) {
                 Text(
-                    text = "Address: " /* TODO: + viewModel.getAedAdress*/,
+                    text = "Address: " + aed?.aedBasics?.address,
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold)
                 )
 
@@ -93,7 +110,7 @@ fun AedDetailsScreen(
             }
             Spacer(modifier = Modifier.padding(10.dp))
 
-            Column(
+            LazyColumn(
                 modifier = Modifier
                     .clip(shape = RoundedCornerShape(10.dp))
                     .background(Color.White)
@@ -101,42 +118,41 @@ fun AedDetailsScreen(
                     .width(200.dp)
 
             ) {
-                Row {
-                    //TODO: Rows with the actual values
-                    Text(
-                        text = "Mon - Wed",
-                        fontSize = 10.sp,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(top = 10.dp)
 
-
-                    )
-                    Divider(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .width(1.dp),
-                        color = Color.LightGray
-                    )
-
-                    Text(
-                        text = "9am - 6pm",
-                        fontSize = 10.sp,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(top = 10.dp)
-                    )
-
+                if (scheduleMap != null) {
+                    items(scheduleMap.toList()) { (day, hours) ->
+                        Row {
+                            Text(
+                                text = day,
+                                fontSize = 10.sp,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(10.dp)
+                            )
+                            Divider(
+                                modifier = Modifier
+                                    .fillMaxHeight()
+                                    .width(1.dp),
+                                color = Color.LightGray
+                            )
+                            Text(
+                                text = hours,
+                                fontSize = 10.sp,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(10.dp)
+                            )
+                        }
+                        Divider(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(1.dp),
+                            color = Color.LightGray
+                        )
+                    }
                 }
-                Divider(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(1.dp),
-                    color = Color.LightGray
-                )
-
             }
             Spacer(modifier = Modifier.padding(10.dp))
 
@@ -147,7 +163,7 @@ fun AedDetailsScreen(
                     .padding(horizontal = 25.dp)
             ) {
                 Text(
-                    text = "Notes: " /* TODO: + viewModel.getAedNotes*/,
+                    text = "Notes: " + aed?.aedBasics?.notes,
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold)
                 )
 
@@ -172,19 +188,23 @@ fun AedDetailsScreen(
                 )
             }
             Spacer(modifier = Modifier.padding(3.dp))
-            Text(
-                text = "Report problem",
-                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
-                color = DarkPink,
-                textDecoration = TextDecoration.Underline,
+            if (showButton) {
+                Text(
+                    text = "Report problem",
+                    style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
+                    color = DarkPink,
+                    textDecoration = TextDecoration.Underline,
 
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        navController.navigate("Report")
-                    },
-                textAlign = TextAlign.Center
-            )
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            onDismiss()
+                            navController.navigate("Report/$aedId")
+                        },
+                    textAlign = TextAlign.Center
+                )
+            }
+
         }
 
     }

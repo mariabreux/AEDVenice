@@ -95,7 +95,7 @@ class FirebaseManager(){
                     val name = document.getString("nome")
                     val city = document.getString("citta")
                     val location = document.getString("ubicazione")
-                    val timetable = document.getString("orari")
+                    val timetable = "{" + document.getString("orari") + "}" //TODO: delete {} when collection changes
                     val phoneNumber = document.get("telefono") as? List<String>
                     val aed = Aed(
                         basics, name, city, location, timetable, phoneNumber

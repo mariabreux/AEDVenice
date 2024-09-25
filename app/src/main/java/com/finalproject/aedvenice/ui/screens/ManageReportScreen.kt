@@ -1,6 +1,7 @@
 package com.finalproject.aedvenice.ui.screens
 
-import android.util.Log
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -37,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -72,6 +74,7 @@ fun ManageReportScreen(viewModel: ViewModel) {
     val onDismiss = { showDialog = false }
     val onConfirm = { } /*TODO: Remove*/
     var selectedReport by remember { mutableStateOf<Report?>(null) }
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -167,8 +170,6 @@ fun ManageReportScreen(viewModel: ViewModel) {
                     Divider()
                 }
             }
-
-
         }
     }
 
@@ -180,7 +181,8 @@ fun ManageReportScreen(viewModel: ViewModel) {
                 onConfirm = { onConfirm() },
                 it,
                 aedState,
-                viewModel
+                viewModel,
+                context
             )
         }
     }
@@ -192,7 +194,8 @@ fun MoreInfoScreen(
     onConfirm: () -> Unit, /*TODO: Remove*/
     report: Report,
     aed: Aed?,
-    viewModel: ViewModel
+    viewModel: ViewModel,
+    context: Context
 ) {
     Dialog(onDismissRequest = onDismiss) {
         Column(
@@ -274,21 +277,35 @@ fun MoreInfoScreen(
                 ),
                 border = BorderStroke(2.dp, BorderPink),
                 onClick = {
-                    report.uuid?.let {
-                        viewModel.banUser(
-                            report.uuid!!,
+                    report.uuid?.let { it1 ->
+                        viewModel.markAsSpam(it1,
                             {
-                                Log.d("Ban User", "User banned")
+                                Toast.makeText(context, "Successfully Marked As Spam", Toast.LENGTH_LONG).show()
+                                report.id?.let { viewModel.deleteReport(it,  {
+                                        Toast.makeText(context, "Report Deleted", Toast.LENGTH_LONG).show()
+                                    },
+                                    {
+                                        Toast.makeText(context, "Error Deleting Report", Toast.LENGTH_LONG).show()
+                                    })
+                                }
                             },
                             {
-                                Log.e("Ban User", "Error banning user")
-                            })
+                                Toast.makeText(context, "Error Marking As Spam", Toast.LENGTH_LONG).show()
+                            },
+                            {
+                                Toast.makeText(context, "User Was Banned", Toast.LENGTH_LONG).show()
+
+                            },
+                            {
+                                Toast.makeText(context, "Error Banning User", Toast.LENGTH_LONG).show()
+                            }
+                        )
                     }
                     onDismiss()
                 }
             ) {
                 androidx.compose.material.Text(
-                    text = "Ban User",
+                    text = "Report as Spam",
                     color = Color.White,
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
                 )
@@ -306,12 +323,12 @@ fun MoreInfoScreen(
                 border = BorderStroke(2.dp, BorderPink),
                 onClick = {
                     report.id?.let {
-                        viewModel.deleteReport(it, {
-                            Log.d("Delete Aed", "Aed deleted")
+                        viewModel.deleteReport(it,  {
+                            Toast.makeText(context, "Report Deleted", Toast.LENGTH_LONG).show()
                         },
-                            {
-                                Log.e("Delete Aed", "Error deleting Aed")
-                            })
+                        {
+                            Toast.makeText(context, "Error Deleting Report", Toast.LENGTH_LONG).show()
+                        })
                     }
                     onDismiss()
                 }
@@ -327,13 +344,13 @@ fun MoreInfoScreen(
 }
 
 @Composable
-fun ShimmerEffect() {
+fun ShimmerEffect(){
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        repeat(4) {
+        repeat(4){
             ShimmerPlaceholder()
             Spacer(modifier = Modifier.height(16.dp))
         }
@@ -341,7 +358,7 @@ fun ShimmerEffect() {
 }
 
 @Composable
-fun ShimmerPlaceholder() {
+fun ShimmerPlaceholder(){
     Box(
         modifier = Modifier
             .fillMaxWidth()

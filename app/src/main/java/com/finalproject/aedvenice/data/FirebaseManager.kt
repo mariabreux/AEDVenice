@@ -1,6 +1,7 @@
 package com.finalproject.aedvenice.data
 
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import com.finalproject.aedvenice.data.aed.Aed
 import com.finalproject.aedvenice.data.aed.AedBasics
@@ -97,7 +98,6 @@ class FirebaseManager(){
                         basics, name, city, location, timetable, phoneNumber
                     )
                     aedLiveData.value = aed
-                    Log.i("get By id", id + aed.city)
                 }else {
                     Log.d("GetAedById", "No such document")
                 }
@@ -175,7 +175,6 @@ class FirebaseManager(){
             .add(newReport)
             .addOnSuccessListener { documentReference ->
                 Log.d("TAG", "Report created with ID: ${documentReference.id}")
-                incrementUserReports(uuid)
                 onSuccess()
             }.addOnFailureListener { exception ->
                 Log.e("TAG", "Error creating Report", exception)
@@ -183,7 +182,7 @@ class FirebaseManager(){
             }
     }
 
-    private fun incrementUserReports(uuid: String){
+    fun incrementUserReports(uuid: String, onSuccess: () -> Unit, onFailure: () -> Unit, onSuccess2: () -> Unit, onFailure2: () -> Unit){
         val usersCollection = db.collection("users")
 
         usersCollection
@@ -193,16 +192,28 @@ class FirebaseManager(){
                 if(!snapshot.isEmpty){
                     val document = snapshot.documents[0]
                     val documentId = document.id
-                    val reports = document.get("reports") as Int
+                    var reports = document.getLong("reports")?.toInt() ?: 0
+                    reports += 1
 
                     usersCollection
                         .document(documentId)
-                        .update("reports", reports + 1)
+                        .update("reports", reports)
                         .addOnSuccessListener {
                             Log.d("User report", "Report incremented successfully")
+                            if(reports == 7){ /*TODO: ver quantos "marked as spam" são necessários para banir utilizador*/
+                                banUser(uuid,
+                                    {
+                                        onSuccess2()
+                                    },
+                                    {
+                                        onFailure2()
+                                    })
+                            }
+                            onSuccess()
                         }
                         .addOnFailureListener {
                             Log.e("User report", "Error incrementing reports")
+                            onFailure()
                         }
                 }
                 else{
@@ -271,6 +282,8 @@ class FirebaseManager(){
     }
 
     fun banUser(uuid: String, onSuccess: () -> Unit, onFailure: () -> Unit){
+        /*TODO: Remover reports do user*/
+        /*TODO: Remover user da base de dados "user"*/
         val bannedUser = hashMapOf(
             "uuid" to uuid
         )

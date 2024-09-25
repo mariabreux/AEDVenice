@@ -130,6 +130,10 @@ class ViewModel @Inject constructor(): ViewModel() {
         }
     }
 
+    fun markAsSpam(uuid: String, onSuccess: () -> Unit, onFailure: () -> Unit, onSuccess2: () -> Unit, onFailure2: () -> Unit){
+        firebaseManager.incrementUserReports(uuid, onSuccess, onFailure, onSuccess2, onFailure2)
+    }
+
     /*MAPS*/
 
     val state: MutableState<MapState> = mutableStateOf(

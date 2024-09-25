@@ -111,7 +111,7 @@ fun MapScreen(
     if(showDialog.value){
         if(aedId != null){
 
-            AedDetailsScreen(onDismiss = { }, onConfirm = { }, navController, aedState, aedId, showButton = !isUserBanned)
+            AedDetailsScreen(onDismiss = { showDialog.value = false }, onConfirm = { }, navController, aedState, aedId, showButton = !isUserBanned)
         }
     }
 }

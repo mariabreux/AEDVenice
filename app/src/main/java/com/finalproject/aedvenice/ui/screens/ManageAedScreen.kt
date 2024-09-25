@@ -83,7 +83,7 @@ fun ManageAedScreen(viewModel: ViewModel, navController: NavHostController) {
                 ),
                 border = BorderStroke(2.dp, BorderPink),
                 onClick = {
-                    navController.navigate("AddEdit Aed")
+                    navController.navigate("AddEditAed")
                 }
             ) {
                 Text(
@@ -149,7 +149,11 @@ fun ManageAedScreen(viewModel: ViewModel, navController: NavHostController) {
                         )
 
                         Row {
-                            IconButton(onClick = { }) {
+                            IconButton(onClick = {
+                                navController.navigate(
+                                    "AddEditAed?aedId=${aed.id}"
+                                )
+                            }) {
                                 Icon(
                                     imageVector = ImageVector.vectorResource(id = R.drawable.edit),
                                     tint = Color.Unspecified,

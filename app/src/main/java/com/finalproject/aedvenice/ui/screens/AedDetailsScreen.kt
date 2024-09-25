@@ -179,10 +179,10 @@ fun AedDetailsScreen(
                     containerColor = DarkPink,
                 ),
                 border = BorderStroke(2.dp, BorderPink),
-                onClick = { /*TODO*/ }
+                onClick = { onDismiss() }
             ) {
                 Text(
-                    text = "Go to location",
+                    text = "Exit",
                     color = Color.White,
                     style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
                 )

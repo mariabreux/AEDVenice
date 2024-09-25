@@ -1,6 +1,7 @@
 package com.finalproject.aedvenice.ui.screens
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -15,6 +16,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,7 +40,10 @@ import com.finalproject.aedvenice.data.aed.GeoPoint
 import com.finalproject.aedvenice.ui.theme.DarkPink
 
 @Composable
-fun AddEditAedScreen(viewModel: ViewModel, navController: NavHostController) {
+fun AddEditAedScreen(viewModel: ViewModel, navController: NavHostController, aedId: String) {
+
+    val aedState by viewModel.getAedById(aedId).observeAsState()
+
     var name by remember { mutableStateOf("") }
     var address by remember { mutableStateOf("") }
     var city by remember { mutableStateOf("") }
@@ -88,22 +93,37 @@ fun AddEditAedScreen(viewModel: ViewModel, navController: NavHostController) {
                                     null,
                                     address,
                                     coordinates,
-                                    note),
+                                    note
+                                ),
                                 name,
                                 city,
                                 location,
                                 "Monday: 2-4", //TODO: pass timetable
                                 listOf("123", "456") //TODO: pass telephone
                             )
-                            viewModel.createAed(
-                                newAed,
-                                onSuccess = {
-                                    Toast.makeText(context, "Aed created successfully", Toast.LENGTH_LONG).show()
-                                },
-                                onFailure = {
-                                    Toast.makeText(context, "Error creating new Aed", Toast.LENGTH_LONG).show()
-                                }
-                            )
+                            if(aedId.isNotEmpty()){ //we are in editable mode
+                               //TODO: viewModel.updateAed()
+
+                            } else{ //we are in add mode
+                                viewModel.createAed(
+                                    newAed,
+                                    onSuccess = {
+                                        Toast.makeText(
+                                            context,
+                                            "Aed created successfully",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                    },
+                                    onFailure = {
+                                        Toast.makeText(
+                                            context,
+                                            "Error creating new Aed",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                    }
+                                )
+                            }
+
                             navController.navigate("Manage Aed")
                         },
                         modifier = Modifier.size(47.dp)
@@ -119,13 +139,50 @@ fun AddEditAedScreen(viewModel: ViewModel, navController: NavHostController) {
         }
 
         item { Spacer(modifier = Modifier.padding(15.dp)) }
-        item { name = formAEDString(text = "Name", tfValue = name) }
-        item { address = formAEDString(text = "Address", tfValue = address) }
-        item { coordinates = formAEDGeo(text = "Coordinates") }
-        item { city = formAEDString(text = "City", tfValue = city) }
-        item { location = formAEDString(text = "Location", tfValue = location) }
-        item { telephone = formAEDString(text = "Telephone", tfValue = telephone) }
-        item { note = formAEDString(text = "Note", tfValue = note) }
+        if(aedId.isNotEmpty()){
+            item {
+                name =
+                    aedState?.name?.let { formAEDString(text = "Name", tfValue = it) }.toString()
+            }
+            item {
+                address =
+                    aedState?.aedBasics?.address?.let { formAEDString(text = "Address", tfValue = it) }
+                        .toString()
+            }
+            item {
+                city =
+                    aedState?.city?.let { formAEDString(text = "City", tfValue = it) }.toString()
+            }
+            item {
+                location =
+                    aedState?.location?.let { formAEDString(text = "Location", tfValue = it) }
+                        .toString()
+            }
+            item {
+                telephone = aedState?.phoneNumber?.forEach{num ->
+                    formAEDString(
+                        text = "Telephone",
+                        tfValue = num
+                    )
+                }.toString()
+
+            }
+            item {
+                note =
+                    aedState?.aedBasics?.notes?.let { formAEDString(text = "Note", tfValue = it) }
+                        .toString()
+            }
+        } else{
+            item { name = formAEDString(text = "Name", tfValue = name) }
+            item { address = formAEDString(text = "Address", tfValue = address) }
+            item { city = formAEDString(text = "City", tfValue = city) }
+            item { location = formAEDString(text = "Location", tfValue = location) }
+            item { telephone = formAEDString(text = "Telephone", tfValue = telephone) }
+            item { note = formAEDString(text = "Note", tfValue = note) }
+            item { coordinates = formAEDGeo(text = "Coordinates") }
+
+        }
+
         item { FormAED(text = "Timetable") }
         item { Spacer(modifier = Modifier.padding(10.dp)) }
         item { Timetable() }
@@ -153,7 +210,7 @@ fun FormAED(text: String) {
 fun formAEDString(
     text: String,
     tfValue: String,
-) : String {
+): String {
     var tf by remember { mutableStateOf(tfValue) }
 
     Row {
@@ -199,7 +256,7 @@ fun formAEDGeo(
     text: String,
     xValue: String = "",
     yValue: String = ""
-) : GeoPoint {
+): GeoPoint {
     var x by remember { mutableStateOf(xValue) }
     var y by remember { mutableStateOf(yValue) }
 
@@ -383,7 +440,8 @@ fun SplitService(
         ) {
 
             Row(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .weight(1f),
             ) {
                 Text(
@@ -404,23 +462,15 @@ fun SplitService(
                 )
             }
 
-            Row{
+            Row {
                 OutlinedTextField(
                     value = start,
                     onValueChange = { },
-                     modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f),
                     textStyle = MaterialTheme.typography.displaySmall.copy(
                         fontWeight = FontWeight.Normal,
                         fontSize = 20.sp
-                    ),
-//                    placeholder = {
-//                        Text(
-//                            text = "From:",
-//                            style = MaterialTheme.typography.displaySmall.copy(
-//                                fontSize = 15.sp,
-//                            )
-//                        )
-//                    }
+                    )
 
                 )
                 Spacer(modifier = Modifier.padding(10.dp))
@@ -444,7 +494,7 @@ fun SplitService(
             }
             Spacer(modifier = Modifier.padding(20.dp))
 
-            Row{
+            Row {
                 OutlinedTextField(
                     value = secondStart,
                     onValueChange = { secondStart = it },
@@ -471,15 +521,7 @@ fun SplitService(
                     textStyle = MaterialTheme.typography.displaySmall.copy(
                         fontWeight = FontWeight.Normal,
                         fontSize = 20.sp
-                    ),
-//                    placeholder = {
-//                        Text(
-//                            text = "To:",
-//                            style = MaterialTheme.typography.displaySmall.copy(
-//                                fontSize = 15.sp,
-//                            )
-//                        )
-//                    }
+                    )
                 )
             }
 

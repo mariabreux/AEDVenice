@@ -38,7 +38,7 @@ import com.finalproject.aedvenice.ui.theme.BorderPink
 import com.finalproject.aedvenice.ui.theme.DarkPink
 
 @Composable
-fun ReportProblemScreen(navController : NavController, viewModel : ViewModel, id: String/*TODO: receive Aed Id*/) {
+fun ReportProblemScreen(navController : NavController, viewModel : ViewModel, id: String) {
     val aed = viewModel.getAedById(id).observeAsState()
     val context = LocalContext.current
 

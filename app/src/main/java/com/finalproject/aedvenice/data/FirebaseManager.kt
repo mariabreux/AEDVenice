@@ -1,18 +1,14 @@
 package com.finalproject.aedvenice.data
 
-import android.telephony.TelephonyManager
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.finalproject.aedvenice.data.aed.Aed
 import com.finalproject.aedvenice.data.aed.AedBasics
 import com.finalproject.aedvenice.data.aed.BannedUser
 import com.finalproject.aedvenice.data.aed.GeoPoint
 import com.finalproject.aedvenice.data.aed.Report
-import com.google.firebase.Firebase
-import com.google.firebase.database.core.Repo
+import com.finalproject.aedvenice.data.aed.User
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.firestore
 
 class FirebaseManager(){
 
@@ -179,10 +175,54 @@ class FirebaseManager(){
             .add(newReport)
             .addOnSuccessListener { documentReference ->
                 Log.d("TAG", "Report created with ID: ${documentReference.id}")
+                incrementUserReports(uuid)
                 onSuccess()
             }.addOnFailureListener { exception ->
                 Log.e("TAG", "Error creating Report", exception)
                 onFailure()
+            }
+    }
+
+    private fun incrementUserReports(uuid: String){
+        val usersCollection = db.collection("users")
+
+        usersCollection
+            .whereEqualTo("uuid", uuid)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                if(!snapshot.isEmpty){
+                    val document = snapshot.documents[0]
+                    val documentId = document.id
+                    val reports = document.get("reports") as Int
+
+                    usersCollection
+                        .document(documentId)
+                        .update("reports", reports + 1)
+                        .addOnSuccessListener {
+                            Log.d("User report", "Report incremented successfully")
+                        }
+                        .addOnFailureListener {
+                            Log.e("User report", "Error incrementing reports")
+                        }
+                }
+                else{
+                    createUser(uuid)
+                }
+            }
+            .addOnFailureListener {
+                Log.i("User report", "Error incrementing reports")
+            }
+    }
+
+    private fun createUser(uuid: String){
+        val user = User(uuid)
+        db.collection("users")
+            .add(user)
+            .addOnSuccessListener {
+                Log.d("User", "User added successfully")
+            }
+            .addOnFailureListener {
+                Log.d("User", "Error adding user")
             }
     }
 
@@ -267,5 +307,4 @@ class FirebaseManager(){
                 }
             }
     }
-    /*TODO: Create a function that checks if user is banned, using getBannedUsers*/
 }

@@ -14,6 +14,8 @@ import androidx.compose.material.ExposedDropdownMenuBox
 import androidx.compose.material.ExposedDropdownMenuDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -51,9 +53,9 @@ fun AddEditAedScreen(viewModel: ViewModel, navController: NavHostController, aed
     var location by remember { mutableStateOf("") }
     var coordinates by remember { mutableStateOf(GeoPoint()) }
     var telephone by remember { mutableStateOf("") } //TODO: Later change to telephone list?
-    var showDays = remember { mutableStateOf(false) }
     val days = arrayOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
-    var selectedDay = remember { mutableStateOf(days[0]) }
+    var timetableEntries = remember { mutableStateListOf<TimetableEntry>() }
+
     val context = LocalContext.current
 
     LazyColumn(
@@ -98,13 +100,13 @@ fun AddEditAedScreen(viewModel: ViewModel, navController: NavHostController, aed
                                 name,
                                 city,
                                 location,
-                                "Monday: 2-4", //TODO: pass timetable
+                                convertTimetableToString(timetableEntries),
                                 listOf("123", "456") //TODO: pass telephone
                             )
-                            if(aedId.isNotEmpty()){ //we are in editable mode
-                               //TODO: viewModel.updateAed()
+                            if (aedId.isNotEmpty()) { //we are in editable mode
+                                //TODO: viewModel.updateAed()
 
-                            } else{ //we are in add mode
+                            } else { //we are in add mode
                                 viewModel.createAed(
                                     newAed,
                                     onSuccess = {
@@ -139,14 +141,19 @@ fun AddEditAedScreen(viewModel: ViewModel, navController: NavHostController, aed
         }
 
         item { Spacer(modifier = Modifier.padding(15.dp)) }
-        if(aedId.isNotEmpty()){
+        if (aedId.isNotEmpty()) {
             item {
                 name =
                     aedState?.name?.let { formAEDString(text = "Name", tfValue = it) }.toString()
             }
             item {
                 address =
-                    aedState?.aedBasics?.address?.let { formAEDString(text = "Address", tfValue = it) }
+                    aedState?.aedBasics?.address?.let {
+                        formAEDString(
+                            text = "Address",
+                            tfValue = it
+                        )
+                    }
                         .toString()
             }
             item {
@@ -159,7 +166,7 @@ fun AddEditAedScreen(viewModel: ViewModel, navController: NavHostController, aed
                         .toString()
             }
             item {
-                telephone = aedState?.phoneNumber?.forEach{num ->
+                telephone = aedState?.phoneNumber?.forEach { num ->
                     formAEDString(
                         text = "Telephone",
                         tfValue = num
@@ -172,7 +179,7 @@ fun AddEditAedScreen(viewModel: ViewModel, navController: NavHostController, aed
                     aedState?.aedBasics?.notes?.let { formAEDString(text = "Note", tfValue = it) }
                         .toString()
             }
-        } else{
+        } else {
             item { name = formAEDString(text = "Name", tfValue = name) }
             item { address = formAEDString(text = "Address", tfValue = address) }
             item { city = formAEDString(text = "City", tfValue = city) }
@@ -185,7 +192,7 @@ fun AddEditAedScreen(viewModel: ViewModel, navController: NavHostController, aed
 
         item { FormAED(text = "Timetable") }
         item { Spacer(modifier = Modifier.padding(10.dp)) }
-        item { Timetable() }
+        item { Timetable(timetableEntries = timetableEntries) }
     }
 }
 
@@ -309,125 +316,189 @@ fun formAEDGeo(
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun Timetable() {
+fun Timetable(timetableEntries: MutableList<TimetableEntry>) {
     val days = arrayOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
-    var expanded by remember { mutableStateOf(false) }
-    var selectedDay by remember { mutableStateOf(days[0]) }
-    var start by remember { mutableStateOf("") }
-    var end by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
+    var selectedEntry by remember { mutableStateOf(TimetableEntry()) }
 
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 10.dp)
-    ) {
-        Box(modifier = Modifier.weight(1.25f)) {
-            ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = { expanded = !expanded }
+
+    Column {
+        timetableEntries.forEachIndexed { index, entry ->
+            var expanded by remember { mutableStateOf(false) }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp)
             ) {
+                Box(modifier = Modifier.weight(1.25f)) {
+                    ExposedDropdownMenuBox(
+                        expanded = expanded,
+                        onExpandedChange = { expanded = !expanded }
+                    ) {
+                        OutlinedTextField(
+                            value = entry.day,
+                            onValueChange = {},
+                            readOnly = true,
+                            modifier = Modifier.fillMaxWidth(),
+                            textStyle = MaterialTheme.typography.displaySmall.copy(
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 20.sp
+                            ),
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }
+                        )
+                        ExposedDropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
+                            days.forEach { day ->
+                                DropdownMenuItem(
+                                    text = { Text(text = day) },
+                                    onClick = {
+                                        timetableEntries[index] =
+                                            timetableEntries[index].copy(day = day)
+
+                                        expanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.padding(10.dp))
+
                 OutlinedTextField(
-                    value = selectedDay,
-                    onValueChange = {},
-                    readOnly = true,
-                    modifier = Modifier.fillMaxWidth(),
+                    value = entry.startTime,
+                    onValueChange = { newStartTime ->
+                        timetableEntries[index] =
+                            timetableEntries[index].copy(startTime = newStartTime)
+
+
+                    },
+                    modifier = Modifier.weight(1f),
                     textStyle = MaterialTheme.typography.displaySmall.copy(
                         fontWeight = FontWeight.Normal,
                         fontSize = 20.sp
                     ),
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }
-                )
-                ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    days.forEach { day ->
-                        DropdownMenuItem(
-                            text = { Text(text = day) },
-                            onClick = {
-                                selectedDay = day
-                                expanded = false
-                            }
+                    placeholder = {
+                        Text(
+                            text = "From:",
+                            style = MaterialTheme.typography.displaySmall.copy(
+                                fontSize = 15.sp,
+                            )
                         )
                     }
-                }
+
+                )
+                Spacer(modifier = Modifier.padding(10.dp))
+                OutlinedTextField(
+                    value = entry.endTime,
+                    onValueChange = { newEndTime ->
+                        timetableEntries[index] = timetableEntries[index].copy(endTime = newEndTime)
+
+                    },
+                    modifier = Modifier.weight(1f),
+                    textStyle = MaterialTheme.typography.displaySmall.copy(
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 20.sp
+                    ),
+                    placeholder = {
+                        Text(
+                            text = "To:",
+                            style = MaterialTheme.typography.displaySmall.copy(
+                                fontSize = 15.sp,
+                            )
+                        )
+                    }
+                )
             }
+
+
+
+            Spacer(modifier = Modifier.padding(5.dp))
+            Text(
+                text = "Split Service ->",
+                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
+                textDecoration = TextDecoration.Underline,
+
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        selectedEntry = entry
+                        showDialog = true
+                    },
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.padding(5.dp))
+
         }
-        Spacer(modifier = Modifier.padding(10.dp))
+        IconButton(onClick = {
+            timetableEntries.add(TimetableEntry())
 
-        OutlinedTextField(
-            value = start,
-            onValueChange = { start = it },
-            modifier = Modifier.weight(1f),
-            textStyle = MaterialTheme.typography.displaySmall.copy(
-                fontWeight = FontWeight.Normal,
-                fontSize = 20.sp
-            ),
-            placeholder = {
-                Text(
-                    text = "From:",
-                    style = MaterialTheme.typography.displaySmall.copy(
-                        fontSize = 15.sp,
-                    )
-                )
-            }
 
-        )
-        Spacer(modifier = Modifier.padding(10.dp))
-        OutlinedTextField(
-            value = end,
-            onValueChange = { end = it },
-            modifier = Modifier.weight(1f),
-            textStyle = MaterialTheme.typography.displaySmall.copy(
-                fontWeight = FontWeight.Normal,
-                fontSize = 20.sp
-            ),
-            placeholder = {
-                Text(
-                    text = "To:",
-                    style = MaterialTheme.typography.displaySmall.copy(
-                        fontSize = 15.sp,
-                    )
-                )
-            }
-        )
-    }
-    Spacer(modifier = Modifier.padding(5.dp))
-    Text(
-        text = "Split Service ->",
-        style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
-        textDecoration = TextDecoration.Underline,
+        }) {
+            Icon(
+                imageVector = Icons.Default.AddCircle,
+                contentDescription = "add",
+                tint = Color.LightGray
+            )
+        }
 
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                showDialog = true
-            },
-        textAlign = TextAlign.Center
-    )
-
-    if (showDialog) {
-        SplitService(onDismiss = { showDialog = false }, selectedDay, start, end)
+        if (showDialog) {
+            SplitService(
+                onDismiss = { showDialog = false },
+                selectedDay = selectedEntry.day,
+                initialStart = selectedEntry.startTime,
+                initialEnd = selectedEntry.endTime,
+                timetableEntry = selectedEntry
+            )
+        }
 
     }
+
 }
 
+data class TimetableEntry(
+    var day: String = "Mon",
+    var startTime: String = "",
+    var endTime: String = "",
+    var firstEnd: String = "",
+    var secondStart: String = ""
+)
+
+fun convertTimetableToString(timetableEntries: List<TimetableEntry>): String { //TODO: probably convert to json when the collection changes
+    return timetableEntries.joinToString(", ") { entry ->
+        if (entry.firstEnd != "" && entry.secondStart != "") {
+            "${entry.day}: ${entry.startTime}-${entry.firstEnd}/${entry.secondStart}-${entry.endTime}"
+        } else {
+            "${entry.day}: ${entry.startTime}-${entry.endTime}"
+
+        }
+    }
+}
 
 @Composable
 fun SplitService(
     onDismiss: () -> Unit,
     selectedDay: String,
     initialStart: String,
-    initialEnd: String
+    initialEnd: String,
+    timetableEntry: TimetableEntry
 ) {
     var start by remember { mutableStateOf(initialStart) }
     var end by remember { mutableStateOf(initialEnd) }
-    var firstEnd by remember { mutableStateOf("") }
-    var secondStart by remember { mutableStateOf("") }
+    var firstEnd by remember { mutableStateOf(timetableEntry.firstEnd) }
+    var secondStart by remember { mutableStateOf(timetableEntry.secondStart) }
 
-    Dialog(onDismissRequest = onDismiss) {
+    Dialog(
+        onDismissRequest = {
+            timetableEntry.firstEnd = firstEnd
+            timetableEntry.secondStart = secondStart
+            onDismiss()
+        }
+    ) {
         Column(
             modifier = Modifier
                 .clip(RoundedCornerShape(5.dp))
@@ -451,6 +522,8 @@ fun SplitService(
 
                     modifier = Modifier
                         .clickable {
+                            timetableEntry.firstEnd = firstEnd
+                            timetableEntry.secondStart = secondStart
                             onDismiss()
                         },
                     textAlign = TextAlign.Start
@@ -476,7 +549,9 @@ fun SplitService(
                 Spacer(modifier = Modifier.padding(10.dp))
                 OutlinedTextField(
                     value = firstEnd,
-                    onValueChange = { firstEnd = it },
+                    onValueChange = { newFirstEnd ->
+                        firstEnd = newFirstEnd
+                    },
                     modifier = Modifier.weight(1f),
                     textStyle = MaterialTheme.typography.displaySmall.copy(
                         fontWeight = FontWeight.Normal,
@@ -497,7 +572,9 @@ fun SplitService(
             Row {
                 OutlinedTextField(
                     value = secondStart,
-                    onValueChange = { secondStart = it },
+                    onValueChange = { newSecondStart ->
+                        secondStart = newSecondStart
+                    },
                     modifier = Modifier.weight(1f),
                     textStyle = MaterialTheme.typography.displaySmall.copy(
                         fontWeight = FontWeight.Normal,

@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,6 +41,8 @@ import com.finalproject.aedvenice.data.aed.Aed
 import com.finalproject.aedvenice.data.aed.AedBasics
 import com.finalproject.aedvenice.data.aed.GeoPoint
 import com.finalproject.aedvenice.ui.theme.DarkPink
+import com.google.gson.Gson
+import com.google.gson.JsonObject
 
 @Composable
 fun AddEditAedScreen(viewModel: ViewModel, navController: NavHostController, aedId: String) {
@@ -52,8 +55,7 @@ fun AddEditAedScreen(viewModel: ViewModel, navController: NavHostController, aed
     var note by remember { mutableStateOf("") }
     var location by remember { mutableStateOf("") }
     var coordinates by remember { mutableStateOf(GeoPoint()) }
-    var telephone by remember { mutableStateOf("") } //TODO: Later change to telephone list?
-    val days = arrayOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+    var telephone = remember { mutableStateListOf<TelephoneEntry>() }
     var timetableEntries = remember { mutableStateListOf<TimetableEntry>() }
 
     val context = LocalContext.current
@@ -101,7 +103,7 @@ fun AddEditAedScreen(viewModel: ViewModel, navController: NavHostController, aed
                                 city,
                                 location,
                                 convertTimetableToString(timetableEntries),
-                                listOf("123", "456") //TODO: pass telephone
+                                convertTelephoneToString(telephone)
                             )
                             if (aedId.isNotEmpty()) { //we are in editable mode
                                 //TODO: viewModel.updateAed()
@@ -166,33 +168,37 @@ fun AddEditAedScreen(viewModel: ViewModel, navController: NavHostController, aed
                         .toString()
             }
             item {
-                telephone = aedState?.phoneNumber?.forEach { num ->
-                    formAEDString(
-                        text = "Telephone",
-                        tfValue = num
-                    )
-                }.toString()
 
+                aedState?.phoneNumber?.let { EditableTelForm(phoneNumber = it) }
             }
             item {
                 note =
                     aedState?.aedBasics?.notes?.let { formAEDString(text = "Note", tfValue = it) }
                         .toString()
             }
+            item { FormAED(text = "Timetable") }
+            item { Spacer(modifier = Modifier.padding(10.dp)) }
+            item {
+                aedState?.timetable.let {
+                    if (it != null) {
+                        EditableTimeTableForm(timetable = it)
+                    }
+                }
+            }
         } else {
             item { name = formAEDString(text = "Name", tfValue = name) }
             item { address = formAEDString(text = "Address", tfValue = address) }
             item { city = formAEDString(text = "City", tfValue = city) }
             item { location = formAEDString(text = "Location", tfValue = location) }
-            item { telephone = formAEDString(text = "Telephone", tfValue = telephone) }
+            item { FormTelephone(telephone) }
             item { note = formAEDString(text = "Note", tfValue = note) }
             item { coordinates = formAEDGeo(text = "Coordinates") }
-
+            item { FormAED(text = "Timetable") }
+            item { Spacer(modifier = Modifier.padding(10.dp)) }
+            item { Timetable(timetableEntries = timetableEntries) }
         }
 
-        item { FormAED(text = "Timetable") }
-        item { Spacer(modifier = Modifier.padding(10.dp)) }
-        item { Timetable(timetableEntries = timetableEntries) }
+
     }
 }
 
@@ -212,11 +218,15 @@ fun FormAED(text: String) {
     }
 }
 
+
 @SuppressLint("Range")
 @Composable
 fun formAEDString(
     text: String,
     tfValue: String,
+    showIconButton: Boolean = false,
+    onIconButtonClick: (() -> Unit)? = null,
+    onValueChange: ((String) -> Unit)? = null
 ): String {
     var tf by remember { mutableStateOf(tfValue) }
 
@@ -242,15 +252,34 @@ fun formAEDString(
             }
         }
 
-        Column(modifier = Modifier.padding(10.dp)) {
+        Row(modifier = Modifier.padding(10.dp)) {
 
             OutlinedTextField(
                 value = tf,
-                onValueChange = { tf = it },
+                onValueChange = {
+                    tf = it
+                    if (onValueChange != null) {
+                        onValueChange(it)
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(45.dp)
+                    .height(47.dp)
+                    .weight(5f)
             )
+
+            if (showIconButton && text == "Telephone") {
+                IconButton(
+                    onClick = { onIconButtonClick?.invoke() },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.AddCircle,
+                        contentDescription = "add",
+                        tint = DarkPink,
+                    )
+                }
+            }
         }
     }
 
@@ -296,7 +325,7 @@ fun formAEDGeo(
                     value = x,
                     onValueChange = { x = it },
                     modifier = Modifier
-                        .height(45.dp)
+                        .height(47.dp)
                         .weight(1f)
                 )
                 Spacer(modifier = Modifier.padding(3.dp))
@@ -304,7 +333,7 @@ fun formAEDGeo(
                     value = y,
                     onValueChange = { y = it },
                     modifier = Modifier
-                        .height(45.dp)
+                        .height(47.dp)
                         .weight(1f)
                 )
             }
@@ -321,9 +350,9 @@ fun Timetable(timetableEntries: MutableList<TimetableEntry>) {
     var showDialog by remember { mutableStateOf(false) }
     var selectedEntry by remember { mutableStateOf(TimetableEntry()) }
 
-
-
-    Column {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         timetableEntries.forEachIndexed { index, entry ->
             var expanded by remember { mutableStateOf(false) }
 
@@ -436,13 +465,12 @@ fun Timetable(timetableEntries: MutableList<TimetableEntry>) {
         }
         IconButton(onClick = {
             timetableEntries.add(TimetableEntry())
-
-
-        }) {
+        }
+        ) {
             Icon(
                 imageVector = Icons.Default.AddCircle,
                 contentDescription = "add",
-                tint = Color.LightGray
+                tint = DarkPink
             )
         }
 
@@ -478,6 +506,88 @@ fun convertTimetableToString(timetableEntries: List<TimetableEntry>): String { /
         }
     }
 }
+
+//@Composable
+//fun EditableTimeTableForm(timetable: String) {
+//    val timetableEntries = remember {
+//        val gson = Gson()
+//        val timetableMap: JsonObject = gson.fromJson(timetable, JsonObject::class.java)
+//
+//        timetableMap.entrySet().map { (day, times) ->
+//            val timeParts = times.asString.split(" / ")
+//            // Supondo que você quer o primeiro par de horários como startTime e endTime
+//            // Você pode modificar isso para lidar com múltiplos horários, se necessário
+//            val (startTime, endTime) = timeParts.getOrNull(0)?.split("-")?.map { it.trim() } ?: listOf("", "")
+//            TimetableEntry(
+//                day = day,
+//                startTime = startTime,
+//                endTime = endTime,
+//                firstEnd = if (timeParts.size > 1) timeParts[0].split("-")[1].trim() else "", // Ajuste conforme necessário
+//                secondStart = if (timeParts.size > 1) timeParts[1].split("-")[0].trim() else ""
+//            )
+//        }.toMutableStateList() // Criar uma lista mutável reativa
+//    }
+//
+//    Column {
+//        Timetable(timetableEntries)
+//    }
+//}
+
+@Composable
+fun EditableTimeTableForm(timetable: String) {
+    val timetableEntries = remember {
+        timetable
+            .split(",")
+            .map { time ->
+                val parts = time.split(":").map { it.trim() }
+
+                val day = parts.getOrNull(0) ?: ""
+
+                if (parts.getOrNull(1)?.contains("/") == true) {
+
+                    val timeSegments = parts.getOrNull(1)?.split("/")?.map { it.trim() }
+                        ?: listOf("")
+                    Log.d("TIME", timeSegments.toString())
+                    val firstTimeParts =
+                        timeSegments.getOrNull(0)?.split("-")?.map { it.trim() } ?: listOf("", "")
+                    Log.d("TIMEPart1", firstTimeParts.toString())
+
+                    val secondTimeParts =
+                        timeSegments.getOrNull(1)?.split("-")?.map { it.trim() } ?: listOf("", "")
+
+                    TimetableEntry(
+                        day = day,
+                        startTime = firstTimeParts.getOrNull(0)
+                            ?: "",
+                        endTime = secondTimeParts.getOrNull(1)
+                            ?: "",
+                        firstEnd = firstTimeParts.getOrNull(1)
+                            ?: "",
+                        secondStart = secondTimeParts.getOrNull(0)
+                            ?: ""
+                    )
+                } else {
+                    val timeSegments = parts.getOrNull(1)?.split("/")?.map { it.trim() }
+                        ?: listOf("")
+                    val firstTimeParts =
+                        timeSegments.getOrNull(0)?.split("-")?.map { it.trim() } ?: listOf("", "")
+                    TimetableEntry(
+                        day = day,
+                        startTime = firstTimeParts.getOrNull(0)
+                            ?: "",
+                        endTime = firstTimeParts.getOrNull(1)
+                            ?: "",
+                    )
+                }
+            }
+            .toMutableStateList()
+    }
+
+    Column {
+        Timetable(timetableEntries)
+    }
+}
+
 
 @Composable
 fun SplitService(
@@ -608,6 +718,66 @@ fun SplitService(
     }
 }
 
+data class TelephoneEntry(
+    var telNum: String = ""
+)
+
+fun convertTelephoneToString(telephoneEntries: List<TelephoneEntry>): String {
+    return telephoneEntries.joinToString("; ") { entry ->
+        entry.telNum
+    }
+}
+
+@Composable
+fun FormTelephone(telephoneEntries: MutableList<TelephoneEntry>) {
+    var tempTelNum by remember { mutableStateOf("") }
+    val updatedTelephoneEntries = remember { telephoneEntries.toMutableStateList() }
+
+    Column {
+        if (updatedTelephoneEntries.isEmpty()) {
+            formAEDString(
+                text = "Telephone",
+                tfValue = tempTelNum,
+                showIconButton = true,
+                onIconButtonClick = {
+                    updatedTelephoneEntries.add(TelephoneEntry(tempTelNum))
+                    tempTelNum = ""
+                },
+                onValueChange = { newValue ->
+                    tempTelNum = newValue
+                }
+            )
+
+        } else {
+            updatedTelephoneEntries.forEachIndexed { index, entry ->
+                formAEDString(
+                    text = "Telephone",
+                    tfValue = entry.telNum,
+                    showIconButton = index == updatedTelephoneEntries.size - 1,
+                    onIconButtonClick = {
+                        updatedTelephoneEntries.add(TelephoneEntry())
+                    },
+                    onValueChange = { newValue ->
+                        updatedTelephoneEntries[index] = entry.copy(telNum = newValue)
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun EditableTelForm(phoneNumber: String) {
+    val telephoneEntries = remember {
+        phoneNumber
+            ?.split(";")
+            ?.map { phone -> TelephoneEntry(phone.trim()) }
+            ?.toMutableList() ?: mutableStateListOf()
+    }
+    Column {
+        FormTelephone(telephoneEntries)
+    }
+}
 
 @Preview(showBackground = true)
 @Composable

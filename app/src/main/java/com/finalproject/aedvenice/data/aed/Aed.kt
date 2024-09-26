@@ -13,7 +13,8 @@ data class Aed(
     val city : String ?= null,
     val location : String ?= null,
     val timetable : String ?= null,
-    val phoneNumber : List<String> ?= emptyList()
+    //val phoneNumber : List<String> ?= emptyList()
+    val phoneNumber : String ?= null
 )
 
 data class GeoPoint(

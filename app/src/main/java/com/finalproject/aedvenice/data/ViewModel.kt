@@ -96,7 +96,7 @@ class ViewModel @Inject constructor(): ViewModel() {
             "venice",
             "inside",
             "Monday: 2-4",
-            listOf("123", "456")
+            "123;456"
         )
         firebaseManager.updateAed(id, update, onSuccess, onFailure)
         getAedBasicsList()

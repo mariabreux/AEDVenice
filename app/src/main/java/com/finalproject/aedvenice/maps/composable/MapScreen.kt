@@ -4,12 +4,8 @@ import android.location.Location
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.TextButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -17,10 +13,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.finalproject.aedvenice.data.ViewModel
-import com.finalproject.aedvenice.data.aed.Aed
 import com.finalproject.aedvenice.data.aed.BannedUser
 import com.finalproject.aedvenice.maps.MapState
 import com.finalproject.aedvenice.ui.screens.AedDetailsScreen
@@ -110,58 +104,10 @@ fun MapScreen(
 
     if(showDialog.value){
         if(aedId != null){
-
             AedDetailsScreen(onDismiss = { showDialog.value = false }, onConfirm = { }, navController, aedState, aedId, showButton = !isUserBanned)
         }
     }
 }
-
-/*@Composable
-fun MyDialog(
-    aed: Aed?,
-    aedId: String?,
-    navController : NavController,
-    showDialog: MutableState<Boolean>,
-    onDismiss: () -> Unit,
-    showButton: Boolean,
-) {
-    AlertDialog(
-        onDismissRequest = {
-            showDialog.value = false
-            onDismiss()
-        },
-        text = {
-            Text(
-                "AED: " + aed?.name
-            )
-        },
-        confirmButton = {
-            if(showButton){ //The button "Report problem" is only shown if the user is not banned, and so, he can report
-                TextButton(
-                    onClick = {
-                        if(aedId != null)
-                            navController.navigate("Report/$aedId")
-                        showDialog.value = false
-                        onDismiss()
-                    }
-                ) {
-                    Text("Report Problem")
-                }
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = {
-                    showDialog.value = false
-                    onDismiss()
-                }
-            ) {
-                /*TODO: button go to location*/
-                Text("Exit")
-            }
-        }
-    )
-}*/
 
 private suspend fun CameraPositionState.centerOnLocation(
     location: Location

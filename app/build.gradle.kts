@@ -98,6 +98,4 @@ dependencies {
     implementation("com.google.accompanist:accompanist-placeholder-material:0.36.0")
 
     implementation("com.google.code.gson:gson:2.10.1")
-
-
 }

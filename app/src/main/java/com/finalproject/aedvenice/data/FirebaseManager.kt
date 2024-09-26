@@ -1,7 +1,6 @@
 package com.finalproject.aedvenice.data
 
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import com.finalproject.aedvenice.data.aed.Aed
 import com.finalproject.aedvenice.data.aed.AedBasics
@@ -182,7 +181,13 @@ class FirebaseManager(){
             }
     }
 
-    fun incrementUserReports(uuid: String, onSuccess: () -> Unit, onFailure: () -> Unit, onSuccess2: () -> Unit, onFailure2: () -> Unit){
+    fun incrementUserReports(
+        uuid: String,
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit,
+        onSuccess2: () -> Unit,
+        onFailure2: () -> Unit
+    ){
         val usersCollection = db.collection("users")
 
         usersCollection
@@ -200,7 +205,8 @@ class FirebaseManager(){
                         .update("reports", reports)
                         .addOnSuccessListener {
                             Log.d("User report", "Report incremented successfully")
-                            if(reports == 7){ /*TODO: ver quantos "marked as spam" são necessários para banir utilizador*/
+                            //If 5 reports of this user were spam, the user is banned
+                            if(reports >= 5){
                                 banUser(uuid,
                                     {
                                         onSuccess2()
@@ -281,9 +287,38 @@ class FirebaseManager(){
             }
     }
 
+    private fun deleteReportsFromUser(uuid: String){
+        val repsCollection = db.collection("report")
+
+        repsCollection
+            .whereEqualTo("uuid", uuid)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                if(!snapshot.isEmpty){
+                    for(document in snapshot){
+                        val docId = document.id
+
+                        repsCollection
+                            .document(docId)
+                            .delete()
+                            .addOnSuccessListener {
+                                Log.i("Delete Report", "Report with $docId id deleted")
+                            }
+                            .addOnFailureListener { e ->
+                                Log.e("Delete Report", "Error deleting report", e)
+                            }
+                    }
+                } else {
+                    Log.i("Delete report", "No reports found with UUID: $uuid")
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e("Delete report", "Error querying reports with UUID: $uuid", e)
+            }
+    }
+
     fun banUser(uuid: String, onSuccess: () -> Unit, onFailure: () -> Unit){
-        /*TODO: Remover reports do user*/
-        /*TODO: Remover user da base de dados "user"*/
+        val userCollection = db.collection("users")
         val bannedUser = hashMapOf(
             "uuid" to uuid
         )
@@ -291,6 +326,27 @@ class FirebaseManager(){
             .add(bannedUser)
             .addOnSuccessListener {
                 Log.d("Banning User", "User banned successfully")
+                //When user is banned, delete all reports from that user
+                deleteReportsFromUser(uuid)
+                //Remove user from "users" database collection
+                userCollection
+                    .whereEqualTo("uuid", uuid)
+                    .get()
+                    .addOnSuccessListener { snapshot ->
+                        if(!snapshot.isEmpty){
+                            val docId = snapshot.documents[0].id
+
+                            userCollection
+                                .document(docId)
+                                .delete()
+                                .addOnSuccessListener {
+                                    Log.i("Removing User", "User removed from database")
+                                }
+                                .addOnFailureListener { e ->
+                                    Log.e("Removing User", "Error removing user", e)
+                                }
+                        }
+                    }
                 onSuccess()
             }
             .addOnFailureListener {

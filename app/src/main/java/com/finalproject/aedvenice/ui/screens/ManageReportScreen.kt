@@ -268,8 +268,7 @@ fun MoreInfoScreen(
 
             Spacer(modifier = Modifier.height(25.dp))
 
-
-            androidx.compose.material3.Button(modifier = Modifier /*TODO: Adapt button*/
+            androidx.compose.material3.Button(modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 40.dp),
                 colors = ButtonDefaults.buttonColors(
@@ -310,9 +309,6 @@ fun MoreInfoScreen(
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
                 )
             }
-
-
-
 
             androidx.compose.material3.Button(modifier = Modifier
                 .fillMaxWidth()

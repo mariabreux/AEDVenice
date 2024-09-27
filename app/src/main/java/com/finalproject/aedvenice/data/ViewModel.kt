@@ -85,20 +85,19 @@ class ViewModel @Inject constructor(): ViewModel() {
     }
 
     fun updateAed(id : String, aed : Aed, onSuccess: () -> Unit, onFailure: () -> Unit){
-        val update = Aed(
-            AedBasics(
-                null,
-                "lost",
-                GeoPoint(45.4785,
-                    12.2533),
-                "functioning"),
-            "second aed",
-            "venice",
-            "inside",
-            "Monday: 2-4",
-            "123;456"
-        )
-        firebaseManager.updateAed(id, update, onSuccess, onFailure)
+//        val update = Aed(
+//            AedBasics(
+//                aed.aedBasics?.id,
+//                aed.aedBasics?.address,
+//                aed.aedBasics?.geoPoint,
+//                aed.aedBasics?.notes),
+//            aed.name,
+//            aed.city,
+//            aed.location,
+//            aed.timetable,
+//            aed.phoneNumber
+//        )
+        firebaseManager.updateAed(id, aed, onSuccess, onFailure)
         getAedBasicsList()
     }
 

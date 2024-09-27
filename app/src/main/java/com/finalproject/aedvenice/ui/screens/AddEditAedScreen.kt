@@ -58,6 +58,7 @@ fun AddEditAedScreen(viewModel: ViewModel, navController: NavHostController, aed
     var telephone = remember { mutableStateListOf<TelephoneEntry>() }
     var timetableEntries = remember { mutableStateListOf<TimetableEntry>() }
 
+
     val context = LocalContext.current
 
     LazyColumn(
@@ -106,9 +107,39 @@ fun AddEditAedScreen(viewModel: ViewModel, navController: NavHostController, aed
                                 convertTelephoneToString(telephone)
                             )
                             if (aedId.isNotEmpty()) { //we are in editable mode
-                                //TODO: viewModel.updateAed()
+                                aedState?.let {
+                                    viewModel.updateAed(
+                                        aedId,
+                                        it.copy(
+                                            aedBasics = AedBasics(
+                                                id = aedId,
+                                                address = address,
+                                                geoPoint = coordinates,
+                                                notes = note
+                                            ),
+                                            name = name,
+                                            city = city,
+                                            location = location,
+                                            timetable = convertTimetableToString(timetableEntries),
+                                            phoneNumber = convertTelephoneToString(telephone)
+                                        ),
+                                        onSuccess = {
+                                            Toast.makeText(
+                                                context,
+                                                "Aed updated successfully",
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                        },
+                                        onFailure = {
+                                            Toast.makeText(
+                                                context,
+                                                "Error updating new Aed",
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                        })
+                                }
 
-                            } else { //we are in add mode
+                                 } else { //we are in add mode
                                 viewModel.createAed(
                                     newAed,
                                     onSuccess = {
@@ -129,6 +160,7 @@ fun AddEditAedScreen(viewModel: ViewModel, navController: NavHostController, aed
                             }
 
                             navController.navigate("Manage Aed")
+
                         },
                         modifier = Modifier.size(47.dp)
                     ) {
@@ -770,9 +802,9 @@ fun FormTelephone(telephoneEntries: MutableList<TelephoneEntry>) {
 fun EditableTelForm(phoneNumber: String) {
     val telephoneEntries = remember {
         phoneNumber
-            ?.split(";")
-            ?.map { phone -> TelephoneEntry(phone.trim()) }
-            ?.toMutableList() ?: mutableStateListOf()
+            .split(";")
+            .map { phone -> TelephoneEntry(phone.trim()) }
+            .toMutableList() 
     }
     Column {
         FormTelephone(telephoneEntries)

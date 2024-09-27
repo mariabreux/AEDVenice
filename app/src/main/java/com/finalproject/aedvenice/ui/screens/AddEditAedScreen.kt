@@ -41,9 +41,8 @@ import com.finalproject.aedvenice.data.aed.Aed
 import com.finalproject.aedvenice.data.aed.AedBasics
 import com.finalproject.aedvenice.data.aed.GeoPoint
 import com.finalproject.aedvenice.ui.theme.DarkPink
-import com.google.gson.Gson
-import com.google.gson.JsonObject
 
+@SuppressLint("UnrememberedMutableState")
 @Composable
 fun AddEditAedScreen(viewModel: ViewModel, navController: NavHostController, aedId: String) {
 
@@ -57,6 +56,12 @@ fun AddEditAedScreen(viewModel: ViewModel, navController: NavHostController, aed
     var coordinates by remember { mutableStateOf(GeoPoint()) }
     var telephone = remember { mutableStateListOf<TelephoneEntry>() }
     var timetableEntries = remember { mutableStateListOf<TimetableEntry>() }
+    var phoneNum by remember {
+        mutableStateOf("")
+    }
+    var time by remember {
+        mutableStateOf("")
+    }
 
 
     val context = LocalContext.current
@@ -103,8 +108,8 @@ fun AddEditAedScreen(viewModel: ViewModel, navController: NavHostController, aed
                                 name,
                                 city,
                                 location,
-                                convertTimetableToString(timetableEntries),
-                                convertTelephoneToString(telephone)
+                                time,
+                                phoneNum
                             )
                             if (aedId.isNotEmpty()) { //we are in editable mode
                                 aedState?.let {
@@ -120,8 +125,8 @@ fun AddEditAedScreen(viewModel: ViewModel, navController: NavHostController, aed
                                             name = name,
                                             city = city,
                                             location = location,
-                                            timetable = convertTimetableToString(timetableEntries),
-                                            phoneNumber = convertTelephoneToString(telephone)
+                                            timetable = time,
+                                            phoneNumber = phoneNum
                                         ),
                                         onSuccess = {
                                             Toast.makeText(
@@ -139,7 +144,7 @@ fun AddEditAedScreen(viewModel: ViewModel, navController: NavHostController, aed
                                         })
                                 }
 
-                                 } else { //we are in add mode
+                            } else { //we are in add mode
                                 viewModel.createAed(
                                     newAed,
                                     onSuccess = {
@@ -200,8 +205,14 @@ fun AddEditAedScreen(viewModel: ViewModel, navController: NavHostController, aed
                         .toString()
             }
             item {
+                aedState?.phoneNumber.let {
+                    if (it != null) {
+                        telephone = EditableTelForm(phoneNumber = it)
+                        phoneNum = convertTelephoneToString(telephone)
+                    }
+                }
 
-                aedState?.phoneNumber?.let { EditableTelForm(phoneNumber = it) }
+
             }
             item {
                 note =
@@ -213,7 +224,8 @@ fun AddEditAedScreen(viewModel: ViewModel, navController: NavHostController, aed
             item {
                 aedState?.timetable.let {
                     if (it != null) {
-                        EditableTimeTableForm(timetable = it)
+                        timetableEntries = EditableTimeTableForm(timetable = it)
+                        time = convertTimetableToString(timetableEntries)
                     }
                 }
             }
@@ -222,12 +234,18 @@ fun AddEditAedScreen(viewModel: ViewModel, navController: NavHostController, aed
             item { address = formAEDString(text = "Address", tfValue = address) }
             item { city = formAEDString(text = "City", tfValue = city) }
             item { location = formAEDString(text = "Location", tfValue = location) }
-            item { FormTelephone(telephone) }
+            item {
+                var entries: SnapshotStateList<TelephoneEntry> = FormTelephone(telephone)
+                phoneNum = convertTelephoneToString(entries)
+            }
             item { note = formAEDString(text = "Note", tfValue = note) }
             item { coordinates = formAEDGeo(text = "Coordinates") }
             item { FormAED(text = "Timetable") }
             item { Spacer(modifier = Modifier.padding(10.dp)) }
-            item { Timetable(timetableEntries = timetableEntries) }
+            item {
+                var table: MutableList<TimetableEntry> = Timetable(timetableEntries)
+                time = convertTimetableToString(table)
+            }
         }
 
 
@@ -377,7 +395,7 @@ fun formAEDGeo(
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun Timetable(timetableEntries: MutableList<TimetableEntry>) {
+fun Timetable(timetableEntries: MutableList<TimetableEntry>): MutableList<TimetableEntry> {
     val days = arrayOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
     var showDialog by remember { mutableStateOf(false) }
     var selectedEntry by remember { mutableStateOf(TimetableEntry()) }
@@ -399,7 +417,7 @@ fun Timetable(timetableEntries: MutableList<TimetableEntry>) {
                         onExpandedChange = { expanded = !expanded }
                     ) {
                         OutlinedTextField(
-                            value = entry.day,
+                            value = entry.day.value,
                             onValueChange = {},
                             readOnly = true,
                             modifier = Modifier.fillMaxWidth(),
@@ -417,8 +435,8 @@ fun Timetable(timetableEntries: MutableList<TimetableEntry>) {
                                 DropdownMenuItem(
                                     text = { Text(text = day) },
                                     onClick = {
-                                        timetableEntries[index] =
-                                            timetableEntries[index].copy(day = day)
+
+                                        timetableEntries[index].day.value = day
 
                                         expanded = false
                                     }
@@ -430,10 +448,9 @@ fun Timetable(timetableEntries: MutableList<TimetableEntry>) {
                 Spacer(modifier = Modifier.padding(10.dp))
 
                 OutlinedTextField(
-                    value = entry.startTime,
+                    value = entry.startTime.value,
                     onValueChange = { newStartTime ->
-                        timetableEntries[index] =
-                            timetableEntries[index].copy(startTime = newStartTime)
+                        timetableEntries[index].startTime.value = newStartTime
 
 
                     },
@@ -454,9 +471,9 @@ fun Timetable(timetableEntries: MutableList<TimetableEntry>) {
                 )
                 Spacer(modifier = Modifier.padding(10.dp))
                 OutlinedTextField(
-                    value = entry.endTime,
+                    value = entry.endTime.value,
                     onValueChange = { newEndTime ->
-                        timetableEntries[index] = timetableEntries[index].copy(endTime = newEndTime)
+                        timetableEntries[index].endTime.value = newEndTime
 
                     },
                     modifier = Modifier.weight(1f),
@@ -509,31 +526,32 @@ fun Timetable(timetableEntries: MutableList<TimetableEntry>) {
         if (showDialog) {
             SplitService(
                 onDismiss = { showDialog = false },
-                selectedDay = selectedEntry.day,
-                initialStart = selectedEntry.startTime,
-                initialEnd = selectedEntry.endTime,
+                selectedDay = selectedEntry.day.value,
+                initialStart = selectedEntry.startTime.value,
+                initialEnd = selectedEntry.endTime.value,
                 timetableEntry = selectedEntry
             )
         }
 
     }
+    return timetableEntries.toMutableList()
 
 }
 
 data class TimetableEntry(
-    var day: String = "Mon",
-    var startTime: String = "",
-    var endTime: String = "",
-    var firstEnd: String = "",
-    var secondStart: String = ""
+    var day: MutableState<String> = mutableStateOf("Mon"),
+    var startTime: MutableState<String> = mutableStateOf(""),
+    var endTime: MutableState<String> = mutableStateOf(""),
+    var firstEnd: MutableState<String> = mutableStateOf(""),
+    var secondStart: MutableState<String> = mutableStateOf(""),
 )
 
 fun convertTimetableToString(timetableEntries: List<TimetableEntry>): String { //TODO: probably convert to json when the collection changes
     return timetableEntries.joinToString(", ") { entry ->
-        if (entry.firstEnd != "" && entry.secondStart != "") {
-            "${entry.day}: ${entry.startTime}-${entry.firstEnd}/${entry.secondStart}-${entry.endTime}"
+        if (entry.firstEnd.value != "" && entry.secondStart.value != "") {
+            "${entry.day.value}: ${entry.startTime.value}-${entry.firstEnd.value}/${entry.secondStart.value}-${entry.endTime.value}"
         } else {
-            "${entry.day}: ${entry.startTime}-${entry.endTime}"
+            "${entry.day.value}: ${entry.startTime.value}-${entry.endTime.value}"
 
         }
     }
@@ -566,7 +584,7 @@ fun convertTimetableToString(timetableEntries: List<TimetableEntry>): String { /
 //}
 
 @Composable
-fun EditableTimeTableForm(timetable: String) {
+fun EditableTimeTableForm(timetable: String): SnapshotStateList<TimetableEntry> {
     val timetableEntries = remember {
         timetable
             .split(",")
@@ -579,24 +597,18 @@ fun EditableTimeTableForm(timetable: String) {
 
                     val timeSegments = parts.getOrNull(1)?.split("/")?.map { it.trim() }
                         ?: listOf("")
-                    Log.d("TIME", timeSegments.toString())
                     val firstTimeParts =
                         timeSegments.getOrNull(0)?.split("-")?.map { it.trim() } ?: listOf("", "")
-                    Log.d("TIMEPart1", firstTimeParts.toString())
 
                     val secondTimeParts =
                         timeSegments.getOrNull(1)?.split("-")?.map { it.trim() } ?: listOf("", "")
 
                     TimetableEntry(
-                        day = day,
-                        startTime = firstTimeParts.getOrNull(0)
-                            ?: "",
-                        endTime = secondTimeParts.getOrNull(1)
-                            ?: "",
-                        firstEnd = firstTimeParts.getOrNull(1)
-                            ?: "",
-                        secondStart = secondTimeParts.getOrNull(0)
-                            ?: ""
+                        day = mutableStateOf(day),
+                        startTime = mutableStateOf(firstTimeParts.getOrNull(0) ?: ""),
+                        endTime = mutableStateOf(secondTimeParts.getOrNull(1) ?: ""),
+                        firstEnd = mutableStateOf(firstTimeParts.getOrNull(1) ?: ""),
+                        secondStart = mutableStateOf(secondTimeParts.getOrNull(0) ?: "")
                     )
                 } else {
                     val timeSegments = parts.getOrNull(1)?.split("/")?.map { it.trim() }
@@ -604,11 +616,9 @@ fun EditableTimeTableForm(timetable: String) {
                     val firstTimeParts =
                         timeSegments.getOrNull(0)?.split("-")?.map { it.trim() } ?: listOf("", "")
                     TimetableEntry(
-                        day = day,
-                        startTime = firstTimeParts.getOrNull(0)
-                            ?: "",
-                        endTime = firstTimeParts.getOrNull(1)
-                            ?: "",
+                        day = mutableStateOf(day),
+                        startTime = mutableStateOf(firstTimeParts.getOrNull(0) ?: ""),
+                        endTime = mutableStateOf(firstTimeParts.getOrNull(1) ?: ""),
                     )
                 }
             }
@@ -618,6 +628,7 @@ fun EditableTimeTableForm(timetable: String) {
     Column {
         Timetable(timetableEntries)
     }
+    return timetableEntries
 }
 
 
@@ -690,9 +701,9 @@ fun SplitService(
                 )
                 Spacer(modifier = Modifier.padding(10.dp))
                 OutlinedTextField(
-                    value = firstEnd,
+                    value = firstEnd.value,
                     onValueChange = { newFirstEnd ->
-                        firstEnd = newFirstEnd
+                        firstEnd.value = newFirstEnd
                     },
                     modifier = Modifier.weight(1f),
                     textStyle = MaterialTheme.typography.displaySmall.copy(
@@ -713,9 +724,9 @@ fun SplitService(
 
             Row {
                 OutlinedTextField(
-                    value = secondStart,
+                    value = secondStart.value,
                     onValueChange = { newSecondStart ->
-                        secondStart = newSecondStart
+                        secondStart.value = newSecondStart
                     },
                     modifier = Modifier.weight(1f),
                     textStyle = MaterialTheme.typography.displaySmall.copy(
@@ -751,64 +762,88 @@ fun SplitService(
 }
 
 data class TelephoneEntry(
-    var telNum: String = ""
+    // var telNum: String = ""
+    var telNum: MutableState<String>
 )
 
 fun convertTelephoneToString(telephoneEntries: List<TelephoneEntry>): String {
     return telephoneEntries.joinToString("; ") { entry ->
-        entry.telNum
+        entry.telNum.value
     }
 }
 
 @Composable
-fun FormTelephone(telephoneEntries: MutableList<TelephoneEntry>) {
-    var tempTelNum by remember { mutableStateOf("") }
-    val updatedTelephoneEntries = remember { telephoneEntries.toMutableStateList() }
+fun FormTelephone(telephoneEntries: MutableList<TelephoneEntry>): SnapshotStateList<TelephoneEntry> {
 
     Column {
-        if (updatedTelephoneEntries.isEmpty()) {
-            formAEDString(
-                text = "Telephone",
-                tfValue = tempTelNum,
-                showIconButton = true,
-                onIconButtonClick = {
-                    updatedTelephoneEntries.add(TelephoneEntry(tempTelNum))
-                    tempTelNum = ""
-                },
-                onValueChange = { newValue ->
-                    tempTelNum = newValue
+        if (telephoneEntries.isEmpty()) {
+            Row(
+                horizontalArrangement = Arrangement.Start
+            ) {
+                Text(
+                    text = "Telephone",
+                    style = MaterialTheme.typography.displaySmall.copy(
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 25.sp
+                    )
+                )
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.info),
+                    contentDescription = "info",
+                    tint = Color.Unspecified,
+                    modifier = Modifier
+                        .size(40.dp)
+                        .padding(start = 10.dp)
+                )
+                IconButton(onClick = {
+                    telephoneEntries.add(TelephoneEntry(mutableStateOf("")))
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.AddCircle,
+                        contentDescription = "add",
+                        tint = DarkPink,
+                    )
                 }
-            )
-
+            }
         } else {
-            updatedTelephoneEntries.forEachIndexed { index, entry ->
+            telephoneEntries.forEachIndexed { index, entry ->
                 formAEDString(
                     text = "Telephone",
-                    tfValue = entry.telNum,
-                    showIconButton = index == updatedTelephoneEntries.size - 1,
+                    tfValue = entry.telNum.value,
+                    showIconButton = index == telephoneEntries.size - 1,
                     onIconButtonClick = {
-                        updatedTelephoneEntries.add(TelephoneEntry())
+                        telephoneEntries.add(TelephoneEntry(mutableStateOf("")))
                     },
                     onValueChange = { newValue ->
-                        updatedTelephoneEntries[index] = entry.copy(telNum = newValue)
+                        telephoneEntries[index].telNum.value = newValue
                     }
                 )
             }
         }
     }
+    return telephoneEntries.toMutableStateList()
 }
 
+
 @Composable
-fun EditableTelForm(phoneNumber: String) {
+fun EditableTelForm(phoneNumber: String): SnapshotStateList<TelephoneEntry> {
     val telephoneEntries = remember {
-        phoneNumber
-            .split(";")
-            .map { phone -> TelephoneEntry(phone.trim()) }
-            .toMutableList() 
+        mutableStateListOf<TelephoneEntry>().apply {
+            phoneNumber
+                .split(";")
+                .map { phone -> TelephoneEntry(mutableStateOf(phone.trim())) }.let {
+                    addAll(it)
+                }
+        }
+
     }
+
+
     Column {
         FormTelephone(telephoneEntries)
     }
+    return telephoneEntries
+
 }
 
 @Preview(showBackground = true)

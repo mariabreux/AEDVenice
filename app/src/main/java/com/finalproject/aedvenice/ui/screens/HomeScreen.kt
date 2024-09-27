@@ -81,7 +81,7 @@ fun HomeScreen(navController: NavHostController, viewModel: ViewModel) {
     ) {
         MapScreen(state = viewModel.state.value, viewModel, navController)
 
-        Column(
+        /*Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
             modifier = Modifier
@@ -126,11 +126,11 @@ fun HomeScreen(navController: NavHostController, viewModel: ViewModel) {
                 }
 
             )
-        }
+        }*/
 
 
     }
-    if (showDialog) {
+    if (showDialog) { /*TODO: Remove?*/
         //AedDetailsScreen(onDismiss = onDismiss, onConfirm = onConfirm, navController)
     }
 

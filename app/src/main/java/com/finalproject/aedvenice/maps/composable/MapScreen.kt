@@ -1,9 +1,21 @@
 package com.finalproject.aedvenice.maps.composable
 
+import android.content.Context
+import android.location.Geocoder
 import android.location.Location
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -12,8 +24,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.finalproject.aedvenice.R
 import com.finalproject.aedvenice.data.ViewModel
 import com.finalproject.aedvenice.data.aed.BannedUser
 import com.finalproject.aedvenice.maps.MapState
@@ -26,6 +43,8 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MarkerInfoWindow
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
+import java.io.IOException
+import java.util.Locale
 
 @Composable
 fun MapScreen(
@@ -40,6 +59,9 @@ fun MapScreen(
     var bannedUsers by remember { mutableStateOf(emptyList<BannedUser>()) }
     var isUserBanned by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(true) }
+    var searchValue by remember { mutableStateOf("") }
+    var searchLocation by remember { mutableStateOf<Location?>(null) }
+
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
@@ -67,6 +89,7 @@ fun MapScreen(
         loc = state.lastKnownLocation
     val cameraPositionState = rememberCameraPositionState()
 
+    //Map
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -102,10 +125,80 @@ fun MapScreen(
         }
     }
 
+    //Search
+    LaunchedEffect(searchLocation) {
+        searchLocation?.let { location ->
+            cameraPositionState.centerOnLocation(location)
+        }
+    }
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ){
+        OutlinedTextField(
+            value = searchValue,
+            onValueChange = { searchValue = it },
+
+            placeholder = {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 55.dp)
+                ) {
+                    Text(
+                        text = "Search",
+                    )
+                }
+            },
+
+            shape = RoundedCornerShape(10.dp),
+            colors = TextFieldDefaults.outlinedTextFieldColors(backgroundColor = Color.White),
+            modifier = Modifier
+                .height(70.dp)
+                .padding(10.dp),
+
+            leadingIcon = {
+                IconButton(onClick = {
+                    searchLocation = getLocation(context, searchValue)
+                    if(searchLocation == null){
+                        Toast.makeText(context, "Error finding location", Toast.LENGTH_SHORT).show()
+                    }
+                }) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.search),
+                        tint = Color.Unspecified,
+                        contentDescription = "search",
+                        modifier = Modifier
+                            .size(30.dp)
+                    )
+                }
+            }
+        )
+    }
+
     if(showDialog.value){
         if(aedId != null){
             AedDetailsScreen(onDismiss = { showDialog.value = false }, onConfirm = { }, navController, aedState, aedId, showButton = !isUserBanned)
         }
+    }
+}
+
+fun getLocation(context: Context, location: String): Location? {
+    val geocoder = Geocoder(context, Locale.getDefault())
+    try {
+        val adds = geocoder.getFromLocationName(location, 1)
+        var loc : Location? = null
+        if(!adds.isNullOrEmpty()){
+            val add = adds[0]
+            loc = Location("geocoder").apply {
+                latitude = add.latitude
+                longitude = add.longitude
+            }
+        }
+        return loc
+    }
+    catch (e: IOException){
+        e.printStackTrace()
+        return null
     }
 }
 

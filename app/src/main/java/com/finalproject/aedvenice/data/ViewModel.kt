@@ -61,13 +61,22 @@ class ViewModel @Inject constructor(): ViewModel() {
     val bannedUsers: State<List<BannedUser>> = _bannedUsers
 
     var adminMode = mutableStateOf(false)
-    init {
-        getAedBasicsList()
-    }
+    /*init {
+        getAedBasicsList { aeds ->
+            _aeds.value = aeds
+        }
+    }*/
 
-    private fun getAedBasicsList(){
+    /*private fun getAedBasicsList(){
         firebaseManager.getAedBasicsList {  aedBasics ->
             _aeds.value = aedBasics
+        }
+    }*/
+
+    fun getAedBasicsList(onUpdate: (List<AedBasics>) -> Unit){
+        firebaseManager.getAedBasicsList { basic ->
+            _aeds.value = basic
+            onUpdate(aeds.value)
         }
     }
 
@@ -81,7 +90,7 @@ class ViewModel @Inject constructor(): ViewModel() {
 
     fun deleteAed(id : String, onSuccess: () -> Unit, onFailure: () -> Unit) {
         firebaseManager.deleteAed(id, onSuccess, onFailure)
-        getAedBasicsList()
+        //getAedBasicsList()
     }
 
     fun updateAed(id : String, aed : Aed, onSuccess: () -> Unit, onFailure: () -> Unit){
@@ -98,7 +107,7 @@ class ViewModel @Inject constructor(): ViewModel() {
 //            aed.phoneNumber
 //        )
         firebaseManager.updateAed(id, aed, onSuccess, onFailure)
-        getAedBasicsList()
+        //getAedBasicsList()
     }
 
     /*REPORTS*/

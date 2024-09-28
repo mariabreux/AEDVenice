@@ -3,6 +3,7 @@ package com.finalproject.aedvenice.maps.composable
 import android.content.Context
 import android.location.Geocoder
 import android.location.Location
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.finalproject.aedvenice.R
 import com.finalproject.aedvenice.data.ViewModel
+import com.finalproject.aedvenice.data.aed.AedBasics
 import com.finalproject.aedvenice.data.aed.BannedUser
 import com.finalproject.aedvenice.maps.MapState
 import com.finalproject.aedvenice.ui.screens.AedDetailsScreen
@@ -52,19 +54,24 @@ fun MapScreen(
     viewModel: ViewModel,
     navController : NavHostController
 ) {
-    val aedBasics = viewModel.aeds.value
+    //val aedBasics = viewModel.aeds.value
     val showDialog = remember { mutableStateOf(false) }
     var aedId by remember { mutableStateOf<String?>("") }
     val aedState by viewModel.getAedById(aedId ?: "").observeAsState(initial = null)
     var bannedUsers by remember { mutableStateOf(emptyList<BannedUser>()) }
     var isUserBanned by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(true) }
+    var aedBasics by remember { mutableStateOf(emptyList<AedBasics>()) }
     var searchValue by remember { mutableStateOf("") }
     var searchLocation by remember { mutableStateOf<Location?>(null) }
 
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
+        viewModel.getAedBasicsList { aeds ->
+            aedBasics = aeds
+            Toast.makeText(context, "All aeds are loaded" + aedBasics.size, Toast.LENGTH_SHORT).show()
+        }
         viewModel.getBannedUsers { bU ->
             bannedUsers = bU
             val currentUser = BannedUser(viewModel.getUUID(context))
@@ -103,6 +110,7 @@ fun MapScreen(
         ) {
 
             for(i in aedBasics){
+                Log.i("AED", i.id.toString() + " " + i.geoPoint.toString())
                 if(i.geoPoint?.latitude != null && i.geoPoint.longitude != null){
                     MarkerInfoWindow(
                         state = rememberMarkerState(position = LatLng(i.geoPoint.latitude, i.geoPoint.longitude)),

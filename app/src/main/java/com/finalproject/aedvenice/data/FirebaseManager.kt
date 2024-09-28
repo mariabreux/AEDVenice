@@ -10,7 +10,7 @@ import com.finalproject.aedvenice.data.aed.Report
 import com.finalproject.aedvenice.data.aed.User
 import com.google.firebase.firestore.FirebaseFirestore
 
-class FirebaseManager(){
+class FirebaseManager{
 
     private val db = FirebaseFirestore.getInstance()
 
@@ -30,7 +30,8 @@ class FirebaseManager(){
             "ubicazione" to aed.location
         )
 
-        db.collection("aed") /*TODO: change to Aed*/
+        //db.collection("aed") /*TODO: change to Aed*/
+        db.collection("aedTest")
             .add(newAed)
             .addOnSuccessListener { documentReference ->
                 Log.d("TAG", "AED created with ID: ${documentReference.id}")
@@ -43,8 +44,9 @@ class FirebaseManager(){
 
     fun getAedBasicsList(onUpdate: (List<AedBasics>) -> Unit){
         val aedCollection = db.collection("aed") /*TODO: change to Aed*/
+        //val aedTestCollection = db.collection("aedTest")
 
-        aedCollection.addSnapshotListener { snapshot, exception ->
+        aedCollection.limit(150)/*aedTestCollection*/.addSnapshotListener { snapshot, exception ->
             if (exception != null) {
                 Log.e("TAG", "Error observing aeds", exception)
                 return@addSnapshotListener
@@ -58,8 +60,9 @@ class FirebaseManager(){
                     val geoPoint = document.get("geo_point") as? Map<String, Double> ?: emptyMap()
 
                     val aed = AedBasics(
-                        id, address, GeoPoint(geoPoint["lat"], geoPoint["long"]), notes
-                        /*TODO: change to lat and long after changing the collection to aed */
+                        id, address, GeoPoint(geoPoint["lat"], geoPoint["lon"]), notes
+                        //id, address, GeoPoint(geoPoint["latitude"], geoPoint["longitude"]), notes
+                        /*TODO: change to lat and lon after changing the collection to aed */
                     )
                     aeds.add(aed)
                 }
@@ -76,17 +79,19 @@ class FirebaseManager(){
         }
 
         db.collection("aed")/*TODO: change to Aed*/
+        //db.collection("aedTest")
             .document(id)
             .get()
             .addOnSuccessListener { document ->
                 if(document != null){
-                    val id = document.id
+                    val docId = document.id
                     val address = document.getString("indirizzo")
                     val notes = document.getString("note")
                     val geoPoint = document.get("geo_point") as? Map<String, Double> ?: emptyMap()
                     val basics = AedBasics(
-                        id, address, GeoPoint(geoPoint?.get("latitude"), geoPoint?.get("longitude")), notes
-                        /*TODO: change to lat and long after changing the collection to aed */
+                        docId, address, GeoPoint(geoPoint?.get("lat"), geoPoint?.get("lon")), notes
+                        //docId, address, GeoPoint(geoPoint?.get("latitude"), geoPoint?.get("longitude")), notes
+                        /*TODO: change to lat and lon after changing the collection to aed */
                     )
                     val name = document.getString("nome")
                     val city = document.getString("citta")
@@ -113,6 +118,7 @@ class FirebaseManager(){
         onFailure: () -> Unit
     ){
         db.collection("aed") /*TODO: change to Aed*/
+        //db.collection("aedTest")
             .document(id)
             .delete()
             .addOnSuccessListener {
@@ -132,6 +138,7 @@ class FirebaseManager(){
         onFailure: () -> Unit
     ){
         db.collection("aed") /*TODO: change to Aed*/
+        //db.collection("aedTest")
             .document(id)
             .update(
                 mapOf(

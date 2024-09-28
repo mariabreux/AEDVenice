@@ -59,8 +59,12 @@ fun ManageAedScreen(viewModel: ViewModel, navController: NavHostController) {
     }
 
     LaunchedEffect(Unit) {
-        aedBasics = viewModel.aeds.value
-        isLoading = false
+        //aedBasics = viewModel.aeds.value
+        //isLoading = false
+        viewModel.getAedBasicsList { aeds ->
+            aedBasics = aeds
+            isLoading = false
+        }
     }
 
 

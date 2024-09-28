@@ -26,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,14 +47,21 @@ import androidx.navigation.NavHostController
 import com.finalproject.aedvenice.R
 import com.finalproject.aedvenice.data.ViewModel
 import com.finalproject.aedvenice.data.aed.Aed
+import com.finalproject.aedvenice.data.aed.AedBasics
 import com.finalproject.aedvenice.ui.theme.BorderPink
 import com.finalproject.aedvenice.ui.theme.DarkPink
 
 @Composable
 fun ManageAedScreen(viewModel: ViewModel, navController: NavHostController) {
-    val aedBasics = viewModel.aeds.value
+    var isLoading by remember { mutableStateOf(true) }
+    var aedBasics by remember {
+        mutableStateOf(emptyList<AedBasics>())
+    }
 
-    //val aed = viewModel.getAedById("8Vc1mw4G6wtTFEu1S5FJ").observeAsState()
+    LaunchedEffect(Unit) {
+        aedBasics = viewModel.aeds.value
+        isLoading = false
+    }
 
 
     Column(
@@ -110,7 +118,13 @@ fun ManageAedScreen(viewModel: ViewModel, navController: NavHostController) {
                 Text(text = "Actions", modifier = Modifier.weight(1f))
             }
 
-            Spacer(modifier = Modifier.padding(15.dp))
+            if (isLoading) {
+                ShimmerEffect()
+            } else {
+                Spacer(modifier = Modifier.padding(15.dp))
+            }
+
+            //Spacer(modifier = Modifier.padding(15.dp))
 
             Column(
                 modifier = Modifier

@@ -30,7 +30,7 @@ class FirebaseManager(){
             "ubicazione" to aed.location
         )
 
-        db.collection("aedTest") /*TODO: change to Aed*/
+        db.collection("aed") /*TODO: change to Aed*/
             .add(newAed)
             .addOnSuccessListener { documentReference ->
                 Log.d("TAG", "AED created with ID: ${documentReference.id}")
@@ -42,7 +42,7 @@ class FirebaseManager(){
     }
 
     fun getAedBasicsList(onUpdate: (List<AedBasics>) -> Unit){
-        val aedCollection = db.collection("aedTest") /*TODO: change to Aed*/
+        val aedCollection = db.collection("aed") /*TODO: change to Aed*/
 
         aedCollection.addSnapshotListener { snapshot, exception ->
             if (exception != null) {
@@ -58,7 +58,7 @@ class FirebaseManager(){
                     val geoPoint = document.get("geo_point") as? Map<String, Double> ?: emptyMap()
 
                     val aed = AedBasics(
-                        id, address, GeoPoint(geoPoint["latitude"], geoPoint["longitude"]), notes
+                        id, address, GeoPoint(geoPoint["lat"], geoPoint["long"]), notes
                         /*TODO: change to lat and long after changing the collection to aed */
                     )
                     aeds.add(aed)
@@ -75,7 +75,7 @@ class FirebaseManager(){
             return aedLiveData
         }
 
-        db.collection("aedTest")/*TODO: change to Aed*/
+        db.collection("aed")/*TODO: change to Aed*/
             .document(id)
             .get()
             .addOnSuccessListener { document ->
@@ -91,7 +91,7 @@ class FirebaseManager(){
                     val name = document.getString("nome")
                     val city = document.getString("citta")
                     val location = document.getString("ubicazione")
-                    val timetable = "{" + document.getString("orari") + "}"//TODO: delete {} when collection changes
+                    val timetable = document.getString("orari") //TODO: delete {} when collection changes
                     val phoneNumber = document.getString("telefono") //as? List<String>
                     val aed = Aed(
                         basics, name, city, location, timetable, phoneNumber
@@ -112,7 +112,7 @@ class FirebaseManager(){
         onSuccess: () -> Unit,
         onFailure: () -> Unit
     ){
-        db.collection("aedTest") /*TODO: change to Aed*/
+        db.collection("aed") /*TODO: change to Aed*/
             .document(id)
             .delete()
             .addOnSuccessListener {
@@ -131,7 +131,7 @@ class FirebaseManager(){
         onSuccess: () -> Unit,
         onFailure: () -> Unit
     ){
-        db.collection("aedTest") /*TODO: change to Aed*/
+        db.collection("aed") /*TODO: change to Aed*/
             .document(id)
             .update(
                 mapOf(

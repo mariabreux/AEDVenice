@@ -48,7 +48,7 @@ object NavigationUtils {
 fun NavigationGraph(navController: NavHostController, viewModel: ViewModel) {
     val context = LocalContext.current
 
-    NavHost(navController = navController, startDestination = "Manage Aed") {
+    NavHost(navController = navController, startDestination = "Home") {
         composable("Home") { HomeScreen(navController, viewModel) }
         composable("Manage Aed") { ManageAedScreen(viewModel, navController) }
         composable("How To Act") { HowToActScreen(context, navController) }

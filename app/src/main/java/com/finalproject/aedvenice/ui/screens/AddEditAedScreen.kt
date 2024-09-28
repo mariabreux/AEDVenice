@@ -1,6 +1,7 @@
 package com.finalproject.aedvenice.ui.screens
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -23,6 +24,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -31,9 +33,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
+import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import com.finalproject.aedvenice.R
 import com.finalproject.aedvenice.data.ViewModel
@@ -41,6 +47,8 @@ import com.finalproject.aedvenice.data.aed.Aed
 import com.finalproject.aedvenice.data.aed.AedBasics
 import com.finalproject.aedvenice.data.aed.GeoPoint
 import com.finalproject.aedvenice.ui.theme.DarkPink
+import java.io.BufferedReader
+import java.io.InputStreamReader
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
@@ -60,6 +68,9 @@ fun AddEditAedScreen(viewModel: ViewModel, navController: NavHostController, aed
         mutableStateOf("")
     }
     var time by remember {
+        mutableStateOf("")
+    }
+    var textInfo by remember {
         mutableStateOf("")
     }
 
@@ -182,8 +193,9 @@ fun AddEditAedScreen(viewModel: ViewModel, navController: NavHostController, aed
         item { Spacer(modifier = Modifier.padding(15.dp)) }
         if (aedId.isNotEmpty()) {
             item {
+                textInfo = readTooltipsInfo(context)[0]
                 name =
-                    aedState?.name?.let { formAEDString(text = "Name", tfValue = it) }.toString()
+                    aedState?.name?.let { formAEDString(text = "Name", tfValue = it, textInfo) }.toString()
             }
             item {
                 address =
@@ -230,16 +242,30 @@ fun AddEditAedScreen(viewModel: ViewModel, navController: NavHostController, aed
                 }
             }
         } else {
-            item { name = formAEDString(text = "Name", tfValue = name) }
-            item { address = formAEDString(text = "Address", tfValue = address) }
-            item { city = formAEDString(text = "City", tfValue = city) }
-            item { location = formAEDString(text = "Location", tfValue = location) }
             item {
-                var entries: SnapshotStateList<TelephoneEntry> = FormTelephone(telephone)
+                textInfo = readTooltipsInfo(context)[0]
+                name = formAEDString(text = "Name", tfValue = name, textInfo)
+            }
+            item {
+                textInfo = readTooltipsInfo(context)[1]
+                address = formAEDString(text = "Address", tfValue = address, textInfo) }
+            item {
+                textInfo = readTooltipsInfo(context)[2]
+                city = formAEDString(text = "City", tfValue = city, textInfo) }
+            item {
+                textInfo = readTooltipsInfo(context)[3]
+                location = formAEDString(text = "Location", tfValue = location, textInfo) }
+            item {
+                textInfo = readTooltipsInfo(context)[4]
+                var entries: SnapshotStateList<TelephoneEntry> = FormTelephone(telephone, textInfo)
                 phoneNum = convertTelephoneToString(entries)
             }
-            item { note = formAEDString(text = "Note", tfValue = note) }
-            item { coordinates = formAEDGeo(text = "Coordinates") }
+            item {
+                textInfo = readTooltipsInfo(context)[5]
+                note = formAEDString(text = "Note", tfValue = note, textInfo) }
+            item {
+                textInfo = readTooltipsInfo(context)[6]
+                coordinates = formAEDGeo(text = "Coordinates", textInfo) }
             item { FormAED(text = "Timetable") }
             item { Spacer(modifier = Modifier.padding(10.dp)) }
             item {
@@ -274,11 +300,16 @@ fun FormAED(text: String) {
 fun formAEDString(
     text: String,
     tfValue: String,
+    tooltip: String?= null,
     showIconButton: Boolean = false,
     onIconButtonClick: (() -> Unit)? = null,
     onValueChange: ((String) -> Unit)? = null
 ): String {
     var tf by remember { mutableStateOf(tfValue) }
+
+    var showTooltip by remember {
+        mutableStateOf(false)
+    }
 
     Row {
         Column(modifier = Modifier.padding(10.dp)) {
@@ -291,16 +322,49 @@ fun formAEDString(
                     )
                 )
 
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.info),
-                    contentDescription = "info",
-                    tint = Color.Unspecified,
+                Box(
                     modifier = Modifier
-                        .size(40.dp)
                         .padding(start = 10.dp)
-                )
+                        .clickable { showTooltip = !showTooltip }
+                ){
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.info),
+                        contentDescription = "info",
+                        tint = Color.Unspecified,
+                        modifier = Modifier
+                            .size(40.dp)
+                            .padding(start = 10.dp)
+                    )
+
+                    if (showTooltip) {
+                        Popup(
+                            alignment = Alignment.TopStart,
+                            offset = IntOffset(
+                                -150,
+                                -100
+                            ),
+                            onDismissRequest = { showTooltip = false },
+                            properties = PopupProperties(focusable = false)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .background(Color.White, shape = MaterialTheme.shapes.small)
+                                    .border(1.dp, DarkPink, shape = MaterialTheme.shapes.small)
+                                    .padding(8.dp)
+                            ) {
+                                Text(
+                                    text = "$tooltip",
+                                    color = Color.Black,
+                                    fontSize = 14.sp,
+                                )
+                            }
+                        }
+                    }
+                }
+
             }
         }
+
 
         Row(modifier = Modifier.padding(10.dp)) {
 
@@ -340,11 +404,14 @@ fun formAEDString(
 @Composable
 fun formAEDGeo(
     text: String,
+    tooltip: String? = null,
     xValue: String = "",
     yValue: String = ""
 ): GeoPoint {
     var x by remember { mutableStateOf(xValue) }
     var y by remember { mutableStateOf(yValue) }
+    var showTooltip by remember { mutableStateOf(false) }
+
 
     Row {
         Column(modifier = Modifier.padding(10.dp)) {
@@ -357,14 +424,45 @@ fun formAEDGeo(
                     )
                 )
 
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.info),
-                    contentDescription = "info",
-                    tint = Color.Unspecified,
+                Box(
                     modifier = Modifier
-                        .size(40.dp)
                         .padding(start = 10.dp)
-                )
+                        .clickable { showTooltip = !showTooltip }
+                ){
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.info),
+                        contentDescription = "info",
+                        tint = Color.Unspecified,
+                        modifier = Modifier
+                            .size(40.dp)
+                            .padding(start = 10.dp)
+                    )
+
+                    if (showTooltip) {
+                        Popup(
+                            alignment = Alignment.TopStart,
+                            offset = IntOffset(
+                                -150,
+                                -100
+                            ),
+                            onDismissRequest = { showTooltip = false },
+                            properties = PopupProperties(focusable = false)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .background(Color.White, shape = MaterialTheme.shapes.small)
+                                    .border(1.dp, DarkPink, shape = MaterialTheme.shapes.small)
+                                    .padding(8.dp)
+                            ) {
+                                Text(
+                                    text = "$tooltip",
+                                    color = Color.Black,
+                                    fontSize = 14.sp,
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -773,7 +871,10 @@ fun convertTelephoneToString(telephoneEntries: List<TelephoneEntry>): String {
 }
 
 @Composable
-fun FormTelephone(telephoneEntries: MutableList<TelephoneEntry>): SnapshotStateList<TelephoneEntry> {
+fun FormTelephone(telephoneEntries: MutableList<TelephoneEntry>, tooltip: String?= null): SnapshotStateList<TelephoneEntry> {
+    var showTooltip by remember {
+        mutableStateOf(false)
+    }
 
     Column {
         if (telephoneEntries.isEmpty()) {
@@ -787,14 +888,45 @@ fun FormTelephone(telephoneEntries: MutableList<TelephoneEntry>): SnapshotStateL
                         fontSize = 25.sp
                     )
                 )
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.info),
-                    contentDescription = "info",
-                    tint = Color.Unspecified,
+                Box(
                     modifier = Modifier
-                        .size(40.dp)
                         .padding(start = 10.dp)
-                )
+                        .clickable { showTooltip = !showTooltip }
+                ){
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.info),
+                        contentDescription = "info",
+                        tint = Color.Unspecified,
+                        modifier = Modifier
+                            .size(40.dp)
+                            .padding(start = 10.dp)
+                    )
+
+                    if (showTooltip) {
+                        Popup(
+                            alignment = Alignment.TopStart,
+                            offset = IntOffset(
+                                -150,
+                                -100
+                            ),
+                            onDismissRequest = { showTooltip = false },
+                            properties = PopupProperties(focusable = false)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .background(Color.White, shape = MaterialTheme.shapes.small)
+                                    .border(1.dp, DarkPink, shape = MaterialTheme.shapes.small)
+                                    .padding(8.dp)
+                            ) {
+                                Text(
+                                    text = "$tooltip",
+                                    color = Color.Black,
+                                    fontSize = 14.sp,
+                                )
+                            }
+                        }
+                    }
+                }
                 IconButton(onClick = {
                     telephoneEntries.add(TelephoneEntry(mutableStateOf("")))
                 }) {
@@ -844,6 +976,21 @@ fun EditableTelForm(phoneNumber: String): SnapshotStateList<TelephoneEntry> {
     }
     return telephoneEntries
 
+}
+
+private fun readTooltipsInfo(context: Context): List<String> {
+    val inputStream = context.resources.openRawResource(R.raw.tooltips)
+    val reader = BufferedReader(InputStreamReader(inputStream))
+    var line: String? = reader.readLine()
+    val lines = mutableListOf<String>()
+    while (line != null) {
+        lines.add(line)
+        line = reader.readLine()
+    }
+
+
+    reader.close()
+    return lines
 }
 
 @Preview(showBackground = true)

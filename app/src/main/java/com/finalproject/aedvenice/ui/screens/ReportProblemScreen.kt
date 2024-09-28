@@ -38,14 +38,12 @@ import com.finalproject.aedvenice.ui.theme.BorderPink
 import com.finalproject.aedvenice.ui.theme.DarkPink
 
 @Composable
-fun ReportProblemScreen(navController : NavController, viewModel : ViewModel, id: String) {
+fun ReportProblemScreen(navController: NavController, viewModel: ViewModel, id: String) {
     val aed = viewModel.getAedById(id).observeAsState()
     val context = LocalContext.current
 
     var reportMessage by remember { mutableStateOf("") }
-    var isIssue1Checked by remember { mutableStateOf(false) }
-    var isIssue2Checked by remember { mutableStateOf(false) }
-    var isOtherChecked by remember { mutableStateOf(false) }
+    var selectedIssue by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -58,11 +56,17 @@ fun ReportProblemScreen(navController : NavController, viewModel : ViewModel, id
         ) {
 
             Checkbox(
-                checked = isIssue1Checked,
+                checked = selectedIssue == "issue1",
                 onCheckedChange = { isChecked ->
-                    isIssue1Checked = isChecked
+                    if (isChecked) {
+                        selectedIssue = "issue1"
+                        reportMessage = ""
+                    } else {
+                        selectedIssue = ""
+                    }
                 },
                 enabled = true
+
             )
             Text(
                 text = "Device is not functioning",
@@ -77,9 +81,15 @@ fun ReportProblemScreen(navController : NavController, viewModel : ViewModel, id
         ) {
 
             Checkbox(
-                checked = isIssue2Checked,
+                checked = selectedIssue == "issue2",
                 onCheckedChange = { isChecked ->
-                    isIssue2Checked = isChecked
+                    if (isChecked) {
+                        selectedIssue = "issue2"
+                        reportMessage = ""
+                    } else{
+                        selectedIssue = ""
+                    }
+
                 },
                 enabled = true
             )
@@ -95,13 +105,15 @@ fun ReportProblemScreen(navController : NavController, viewModel : ViewModel, id
         ) {
 
             Checkbox(
-                checked = isOtherChecked,
+                checked = selectedIssue == "other",
                 onCheckedChange = { isChecked ->
-                    isOtherChecked = isChecked
-
-                    if (!isOtherChecked) {
+                    if(isChecked){
+                        selectedIssue = "other"
+                    } else{
+                        selectedIssue = ""
                         reportMessage = ""
                     }
+
                 },
                 enabled = true
             )
@@ -112,7 +124,7 @@ fun ReportProblemScreen(navController : NavController, viewModel : ViewModel, id
             )
         }
 
-        if (isOtherChecked) {
+        if (selectedIssue == "other") {
             Column(
                 modifier = Modifier
                     .padding(27.dp)
@@ -150,9 +162,9 @@ fun ReportProblemScreen(navController : NavController, viewModel : ViewModel, id
                 ),
                 border = BorderStroke(2.dp, BorderPink),
                 onClick = {
-                    if(isIssue1Checked){
+                    if (selectedIssue == "issue1") {
                         reportMessage = "Device is not functioning"
-                    } else if(isIssue2Checked){
+                    } else if (selectedIssue == "issue2") {
                         reportMessage = "There is no device in this location"
                     }
                     aed.value?.aedBasics?.geoPoint?.let {

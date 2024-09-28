@@ -1,0 +1,7 @@
+Enter the full name of the building where the AED is located.
+Enter the street name and building number.
+Specify the city where the AED is located.
+Describe the specific location of the AED inside the building (ex: "in the back room").
+Contact number of the building. Click on the '+' icon to add more contacts if necessary).
+Include any special information related to the AED (ex: availability on festive days).
+Enter the latitude and longitude, respectively.

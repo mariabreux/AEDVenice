@@ -17,6 +17,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -195,7 +196,8 @@ fun AddEditAedScreen(viewModel: ViewModel, navController: NavHostController, aed
             item {
                 textInfo = readTooltipsInfo(context)[0]
                 name =
-                    aedState?.name?.let { formAEDString(text = "Name", tfValue = it, textInfo) }.toString()
+                    aedState?.name?.let { formAEDString(text = "Name", tfValue = it, textInfo) }
+                        .toString()
             }
             item {
                 address =
@@ -248,13 +250,16 @@ fun AddEditAedScreen(viewModel: ViewModel, navController: NavHostController, aed
             }
             item {
                 textInfo = readTooltipsInfo(context)[1]
-                address = formAEDString(text = "Address", tfValue = address, textInfo) }
+                address = formAEDString(text = "Address", tfValue = address, textInfo)
+            }
             item {
                 textInfo = readTooltipsInfo(context)[2]
-                city = formAEDString(text = "City", tfValue = city, textInfo) }
+                city = formAEDString(text = "City", tfValue = city, textInfo)
+            }
             item {
                 textInfo = readTooltipsInfo(context)[3]
-                location = formAEDString(text = "Location", tfValue = location, textInfo) }
+                location = formAEDString(text = "Location", tfValue = location, textInfo)
+            }
             item {
                 textInfo = readTooltipsInfo(context)[4]
                 var entries: SnapshotStateList<TelephoneEntry> = FormTelephone(telephone, textInfo)
@@ -262,10 +267,12 @@ fun AddEditAedScreen(viewModel: ViewModel, navController: NavHostController, aed
             }
             item {
                 textInfo = readTooltipsInfo(context)[5]
-                note = formAEDString(text = "Note", tfValue = note, textInfo) }
+                note = formAEDString(text = "Note", tfValue = note, textInfo)
+            }
             item {
                 textInfo = readTooltipsInfo(context)[6]
-                coordinates = formAEDGeo(text = "Coordinates", textInfo) }
+                coordinates = formAEDGeo(text = "Coordinates", textInfo)
+            }
             item { FormAED(text = "Timetable") }
             item { Spacer(modifier = Modifier.padding(10.dp)) }
             item {
@@ -300,9 +307,10 @@ fun FormAED(text: String) {
 fun formAEDString(
     text: String,
     tfValue: String,
-    tooltip: String?= null,
+    tooltip: String? = null,
     showIconButton: Boolean = false,
     onIconButtonClick: (() -> Unit)? = null,
+    onRemoveIcon: (() -> Unit)? = null,
     onValueChange: ((String) -> Unit)? = null
 ): String {
     var tf by remember { mutableStateOf(tfValue) }
@@ -324,9 +332,9 @@ fun formAEDString(
 
                 Box(
                     modifier = Modifier
-                        .padding(start = 10.dp)
+                        .padding(start = 3.dp)
                         .clickable { showTooltip = !showTooltip }
-                ){
+                ) {
                     Icon(
                         imageVector = ImageVector.vectorResource(id = R.drawable.info),
                         contentDescription = "info",
@@ -383,18 +391,36 @@ fun formAEDString(
             )
 
             if (showIconButton && text == "Telephone") {
-                IconButton(
-                    onClick = { onIconButtonClick?.invoke() },
+                Column (
+                    verticalArrangement = Arrangement.spacedBy(-(15).dp),
                     modifier = Modifier.weight(1f)
+                        .offset(0.dp, -(15).dp)
+
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.AddCircle,
-                        contentDescription = "add",
-                        tint = DarkPink,
-                    )
+                    IconButton(
+                        onClick = { onIconButtonClick?.invoke() },
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.AddCircle,
+                            contentDescription = "add",
+                            tint = DarkPink,
+                        )
+                    }
+                    IconButton(onClick = {
+                        onRemoveIcon?.invoke()
+                    }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "delete",
+                            tint = DarkPink
+                        )
+                    }
                 }
+
             }
         }
+
     }
 
     return tf
@@ -426,9 +452,9 @@ fun formAEDGeo(
 
                 Box(
                     modifier = Modifier
-                        .padding(start = 10.dp)
+                        .padding(start = 3.dp)
                         .clickable { showTooltip = !showTooltip }
-                ){
+                ) {
                     Icon(
                         imageVector = ImageVector.vectorResource(id = R.drawable.info),
                         contentDescription = "info",
@@ -497,6 +523,7 @@ fun Timetable(timetableEntries: MutableList<TimetableEntry>): MutableList<Timeta
     val days = arrayOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
     var showDialog by remember { mutableStateOf(false) }
     var selectedEntry by remember { mutableStateOf(TimetableEntry()) }
+    var selectedEntryRemove by remember { mutableStateOf(TimetableEntry()) }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
@@ -608,18 +635,32 @@ fun Timetable(timetableEntries: MutableList<TimetableEntry>): MutableList<Timeta
             )
 
             Spacer(modifier = Modifier.padding(5.dp))
+            selectedEntryRemove = entry
 
         }
-        IconButton(onClick = {
-            timetableEntries.add(TimetableEntry())
+        Row {
+            IconButton(onClick = {
+                timetableEntries.add(TimetableEntry())
+            }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.AddCircle,
+                    contentDescription = "add",
+                    tint = DarkPink
+                )
+            }
+            IconButton(onClick = {
+                timetableEntries.remove(selectedEntryRemove)
+            }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "delete",
+                    tint = DarkPink
+                )
+            }
         }
-        ) {
-            Icon(
-                imageVector = Icons.Default.AddCircle,
-                contentDescription = "add",
-                tint = DarkPink
-            )
-        }
+
 
         if (showDialog) {
             SplitService(
@@ -871,7 +912,10 @@ fun convertTelephoneToString(telephoneEntries: List<TelephoneEntry>): String {
 }
 
 @Composable
-fun FormTelephone(telephoneEntries: MutableList<TelephoneEntry>, tooltip: String?= null): SnapshotStateList<TelephoneEntry> {
+fun FormTelephone(
+    telephoneEntries: MutableList<TelephoneEntry>,
+    tooltip: String? = null
+): SnapshotStateList<TelephoneEntry> {
     var showTooltip by remember {
         mutableStateOf(false)
     }
@@ -892,7 +936,7 @@ fun FormTelephone(telephoneEntries: MutableList<TelephoneEntry>, tooltip: String
                     modifier = Modifier
                         .padding(start = 10.dp)
                         .clickable { showTooltip = !showTooltip }
-                ){
+                ) {
                     Icon(
                         imageVector = ImageVector.vectorResource(id = R.drawable.info),
                         contentDescription = "info",
@@ -927,6 +971,7 @@ fun FormTelephone(telephoneEntries: MutableList<TelephoneEntry>, tooltip: String
                         }
                     }
                 }
+
                 IconButton(onClick = {
                     telephoneEntries.add(TelephoneEntry(mutableStateOf("")))
                 }) {
@@ -936,6 +981,8 @@ fun FormTelephone(telephoneEntries: MutableList<TelephoneEntry>, tooltip: String
                         tint = DarkPink,
                     )
                 }
+
+
             }
         } else {
             telephoneEntries.forEachIndexed { index, entry ->
@@ -946,10 +993,14 @@ fun FormTelephone(telephoneEntries: MutableList<TelephoneEntry>, tooltip: String
                     onIconButtonClick = {
                         telephoneEntries.add(TelephoneEntry(mutableStateOf("")))
                     },
+                    onRemoveIcon = {
+                        telephoneEntries.removeAt(index)
+                    },
                     onValueChange = { newValue ->
                         telephoneEntries[index].telNum.value = newValue
                     }
                 )
+
             }
         }
     }

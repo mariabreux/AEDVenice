@@ -44,6 +44,7 @@ import com.google.gson.reflect.TypeToken
 fun parseTimetable(json: String): Map<String, String> {
     val gson = Gson()
     val mapType = object : TypeToken<Map<String, String>>() {}.type
+
     return gson.fromJson(json, mapType)
 }
 
@@ -59,11 +60,12 @@ fun AedDetailsScreen(
 ) {
 
     val scheduleMap = aed?.timetable?.trimIndent()?.let { parseTimetable(it) }
+
     Dialog(onDismissRequest = onDismiss) {
         Column(
             modifier = Modifier
                 .clip(RoundedCornerShape(5.dp))
-                .height(415.dp)
+                .height(525.dp)
                 .width(300.dp)
                 .background(LightPink)
                 .border(2.dp, color = DarkPink, shape = RoundedCornerShape(5.dp)),
@@ -108,7 +110,7 @@ fun AedDetailsScreen(
                 modifier = Modifier
                     .clip(shape = RoundedCornerShape(10.dp))
                     .background(Color.White)
-                    .height(95.dp)
+                    .height(125.dp)
                     .width(200.dp)
 
             ) {
@@ -126,18 +128,25 @@ fun AedDetailsScreen(
                             )
                             Divider(
                                 modifier = Modifier
-                                    .fillMaxHeight()
+                                    .height(52.dp)
                                     .width(1.dp),
                                 color = Color.LightGray
                             )
-                            Text(
-                                text = hours,
-                                fontSize = 10.sp,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .padding(10.dp)
-                            )
+
+                            Column(modifier = Modifier.weight(1f).padding(10.dp)) {
+                                val hourList = hours.split("/").map { it.trim() }
+                                hourList.forEach { hour ->
+                                    Text(
+                                        text = hour,
+                                        fontSize = 10.sp,
+                                        textAlign = TextAlign.Center,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(bottom = 4.dp)
+                                    )
+
+                                }
+                            }
                         }
                         Divider(
                             modifier = Modifier
@@ -150,13 +159,14 @@ fun AedDetailsScreen(
             }
             Spacer(modifier = Modifier.padding(10.dp))
 
-            if(aed?.aedBasics?.notes != null){
-                Column(
-                    horizontalAlignment = Alignment.Start,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 25.dp)
-                ) {
+
+            Column(
+                horizontalAlignment = Alignment.Start,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 25.dp)
+            ) {
+                if (aed?.aedBasics?.notes != null) {
                     Text(
                         text = "Notes: " + aed.aedBasics.notes,
                         style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold)

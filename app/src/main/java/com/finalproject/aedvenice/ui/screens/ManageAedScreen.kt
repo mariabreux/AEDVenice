@@ -3,6 +3,7 @@ package com.finalproject.aedvenice.ui.screens
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -130,22 +132,25 @@ fun ManageAedScreen(viewModel: ViewModel, navController: NavHostController) {
 
             //Spacer(modifier = Modifier.padding(15.dp))
 
-            Column(
+            LazyColumn(
                 modifier = Modifier
                     .border(BorderStroke(1.dp, Color.LightGray), shape = RoundedCornerShape(5.dp))
             ) {
+                item {
+
+
                 aedBasics.forEach { aed ->
                     Row {
                         Text(
                             text = aed.address ?: "", modifier = Modifier
                                 .weight(1f)
-                                .padding(horizontal = 5.dp)
+                                .padding(horizontal = 15.dp)
                                 .align(Alignment.CenterVertically)
                         )
 
                         Divider(
                             modifier = Modifier
-                                .height(50.dp)
+                                .height(360.dp)
                                 .width(1.dp),
                             color = Color.LightGray
                         )
@@ -153,20 +158,20 @@ fun ManageAedScreen(viewModel: ViewModel, navController: NavHostController) {
 
                         Text(
                             text = aed.notes ?: "", modifier = Modifier
-                                .weight(1f)
-                                .padding(horizontal = 5.dp)
+                                .weight(1.5f)
+                                .padding(horizontal = 3.dp)
                                 .align(Alignment.CenterVertically)
 
                         )
 
                         Divider(
                             modifier = Modifier
-                                .height(50.dp)
+                                .height(360.dp)
                                 .width(1.dp),
                             color = Color.LightGray
                         )
 
-                        Row {
+                        Column(modifier = Modifier.offset(0.dp, (140).dp)) {
                             IconButton(onClick = {
                                 navController.navigate(
                                     "AddEditAed?aedId=${aed.id}"
@@ -204,6 +209,7 @@ fun ManageAedScreen(viewModel: ViewModel, navController: NavHostController) {
                     }
                     Divider()
                 }
+            }
 
             }
 

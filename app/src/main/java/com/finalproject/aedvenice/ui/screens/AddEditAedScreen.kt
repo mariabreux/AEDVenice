@@ -48,6 +48,8 @@ import com.finalproject.aedvenice.data.aed.Aed
 import com.finalproject.aedvenice.data.aed.AedBasics
 import com.finalproject.aedvenice.data.aed.GeoPoint
 import com.finalproject.aedvenice.ui.theme.DarkPink
+import com.google.gson.Gson
+import com.google.gson.JsonObject
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
@@ -240,6 +242,9 @@ fun AddEditAedScreen(viewModel: ViewModel, navController: NavHostController, aed
                     if (it != null) {
                         timetableEntries = EditableTimeTableForm(timetable = it)
                         time = convertTimetableToString(timetableEntries)
+                    } else{
+                        timetableEntries = EditableTimeTableForm(timetable = "")
+                        time = convertTimetableToString(timetableEntries)
                     }
                 }
             }
@@ -386,14 +391,15 @@ fun formAEDString(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(47.dp)
+                    .height(50.dp)
                     .weight(5f)
             )
 
             if (showIconButton && text == "Telephone") {
-                Column (
+                Column(
                     verticalArrangement = Arrangement.spacedBy(-(15).dp),
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .weight(1f)
                         .offset(0.dp, -(15).dp)
 
                 ) {
@@ -520,7 +526,7 @@ fun formAEDGeo(
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun Timetable(timetableEntries: MutableList<TimetableEntry>): MutableList<TimetableEntry> {
-    val days = arrayOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+    val days = arrayOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
     var showDialog by remember { mutableStateOf(false) }
     var selectedEntry by remember { mutableStateOf(TimetableEntry()) }
     var selectedEntryRemove by remember { mutableStateOf(TimetableEntry()) }
@@ -534,9 +540,9 @@ fun Timetable(timetableEntries: MutableList<TimetableEntry>): MutableList<Timeta
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 10.dp)
+                    .padding(horizontal = 5.dp)
             ) {
-                Box(modifier = Modifier.weight(1.25f)) {
+                Box(modifier = Modifier.weight(2.15f)) {
                     ExposedDropdownMenuBox(
                         expanded = expanded,
                         onExpandedChange = { expanded = !expanded }
@@ -548,7 +554,7 @@ fun Timetable(timetableEntries: MutableList<TimetableEntry>): MutableList<Timeta
                             modifier = Modifier.fillMaxWidth(),
                             textStyle = MaterialTheme.typography.displaySmall.copy(
                                 fontWeight = FontWeight.Normal,
-                                fontSize = 20.sp
+                                fontSize = 15.sp
                             ),
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }
                         )
@@ -582,7 +588,7 @@ fun Timetable(timetableEntries: MutableList<TimetableEntry>): MutableList<Timeta
                     modifier = Modifier.weight(1f),
                     textStyle = MaterialTheme.typography.displaySmall.copy(
                         fontWeight = FontWeight.Normal,
-                        fontSize = 20.sp
+                        fontSize = 15.sp
                     ),
                     placeholder = {
                         Text(
@@ -604,7 +610,7 @@ fun Timetable(timetableEntries: MutableList<TimetableEntry>): MutableList<Timeta
                     modifier = Modifier.weight(1f),
                     textStyle = MaterialTheme.typography.displaySmall.copy(
                         fontWeight = FontWeight.Normal,
-                        fontSize = 20.sp
+                        fontSize = 15.sp
                     ),
                     placeholder = {
                         Text(
@@ -634,7 +640,7 @@ fun Timetable(timetableEntries: MutableList<TimetableEntry>): MutableList<Timeta
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.padding(5.dp))
+            Spacer(modifier = Modifier.padding(15.dp))
             selectedEntryRemove = entry
 
         }
@@ -678,70 +684,45 @@ fun Timetable(timetableEntries: MutableList<TimetableEntry>): MutableList<Timeta
 }
 
 data class TimetableEntry(
-    var day: MutableState<String> = mutableStateOf("Mon"),
+    var day: MutableState<String> = mutableStateOf("Monday"),
     var startTime: MutableState<String> = mutableStateOf(""),
     var endTime: MutableState<String> = mutableStateOf(""),
     var firstEnd: MutableState<String> = mutableStateOf(""),
     var secondStart: MutableState<String> = mutableStateOf(""),
 )
 
-fun convertTimetableToString(timetableEntries: List<TimetableEntry>): String { //TODO: probably convert to json when the collection changes
-    return timetableEntries.joinToString(", ") { entry ->
-        if (entry.firstEnd.value != "" && entry.secondStart.value != "") {
-            "${entry.day.value}: ${entry.startTime.value}-${entry.firstEnd.value}/${entry.secondStart.value}-${entry.endTime.value}"
+fun convertTimetableToString(timetableEntries: List<TimetableEntry>): String {
+    val resultMap = timetableEntries.associate { entry ->
+        val hours = if (entry.firstEnd.value.isNotEmpty() && entry.secondStart.value.isNotEmpty()) {
+            "${entry.startTime.value}-${entry.firstEnd.value} / ${entry.secondStart.value}-${entry.endTime.value}"
         } else {
-            "${entry.day.value}: ${entry.startTime.value}-${entry.endTime.value}"
-
+            "${entry.startTime.value}-${entry.endTime.value}"
         }
+        entry.day.value to hours
+    }
+
+    return resultMap.entries.joinToString(prefix = "{", postfix = "}") { (day, hours) ->
+        "'$day': '$hours'"
     }
 }
-
-//@Composable
-//fun EditableTimeTableForm(timetable: String) {
-//    val timetableEntries = remember {
-//        val gson = Gson()
-//        val timetableMap: JsonObject = gson.fromJson(timetable, JsonObject::class.java)
-//
-//        timetableMap.entrySet().map { (day, times) ->
-//            val timeParts = times.asString.split(" / ")
-//            // Supondo que você quer o primeiro par de horários como startTime e endTime
-//            // Você pode modificar isso para lidar com múltiplos horários, se necessário
-//            val (startTime, endTime) = timeParts.getOrNull(0)?.split("-")?.map { it.trim() } ?: listOf("", "")
-//            TimetableEntry(
-//                day = day,
-//                startTime = startTime,
-//                endTime = endTime,
-//                firstEnd = if (timeParts.size > 1) timeParts[0].split("-")[1].trim() else "", // Ajuste conforme necessário
-//                secondStart = if (timeParts.size > 1) timeParts[1].split("-")[0].trim() else ""
-//            )
-//        }.toMutableStateList() // Criar uma lista mutável reativa
-//    }
-//
-//    Column {
-//        Timetable(timetableEntries)
-//    }
-//}
 
 @Composable
 fun EditableTimeTableForm(timetable: String): SnapshotStateList<TimetableEntry> {
     val timetableEntries = remember {
-        timetable
-            .split(",")
-            .map { time ->
-                val parts = time.split(":").map { it.trim() }
+        if (timetable.isEmpty()) {
+            mutableStateListOf<TimetableEntry>()
+        } else {
+            val gson = Gson()
+            val timetableMap: JsonObject = gson.fromJson(timetable, JsonObject::class.java)
 
-                val day = parts.getOrNull(0) ?: ""
+            timetableMap.entrySet().map { (day, times) ->
+                val timeParts = times.asString.split(" / ")
+                val firstTimeParts =
+                    timeParts.getOrNull(0)?.split("-")?.map { it.trim() } ?: listOf("", "")
 
-                if (parts.getOrNull(1)?.contains("/") == true) {
-
-                    val timeSegments = parts.getOrNull(1)?.split("/")?.map { it.trim() }
-                        ?: listOf("")
-                    val firstTimeParts =
-                        timeSegments.getOrNull(0)?.split("-")?.map { it.trim() } ?: listOf("", "")
-
-                    val secondTimeParts =
-                        timeSegments.getOrNull(1)?.split("-")?.map { it.trim() } ?: listOf("", "")
-
+                val secondTimeParts =
+                    timeParts.getOrNull(1)?.split("-")?.map { it.trim() } ?: listOf("", "")
+                if (timeParts.size > 1) {
                     TimetableEntry(
                         day = mutableStateOf(day),
                         startTime = mutableStateOf(firstTimeParts.getOrNull(0) ?: ""),
@@ -749,19 +730,16 @@ fun EditableTimeTableForm(timetable: String): SnapshotStateList<TimetableEntry> 
                         firstEnd = mutableStateOf(firstTimeParts.getOrNull(1) ?: ""),
                         secondStart = mutableStateOf(secondTimeParts.getOrNull(0) ?: "")
                     )
+
                 } else {
-                    val timeSegments = parts.getOrNull(1)?.split("/")?.map { it.trim() }
-                        ?: listOf("")
-                    val firstTimeParts =
-                        timeSegments.getOrNull(0)?.split("-")?.map { it.trim() } ?: listOf("", "")
                     TimetableEntry(
                         day = mutableStateOf(day),
                         startTime = mutableStateOf(firstTimeParts.getOrNull(0) ?: ""),
                         endTime = mutableStateOf(firstTimeParts.getOrNull(1) ?: ""),
                     )
                 }
-            }
-            .toMutableStateList()
+            }.toMutableStateList()
+        }
     }
 
     Column {
@@ -769,7 +747,6 @@ fun EditableTimeTableForm(timetable: String): SnapshotStateList<TimetableEntry> 
     }
     return timetableEntries
 }
-
 
 @Composable
 fun SplitService(

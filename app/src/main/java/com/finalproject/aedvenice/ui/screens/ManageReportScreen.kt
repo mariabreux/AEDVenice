@@ -117,7 +117,7 @@ fun ManageReportScreen(viewModel: ViewModel) {
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-            Text(text = "Address", modifier = Modifier.weight(1f))
+            Text(text = "AED ID", modifier = Modifier.weight(1f))
         }
 
         if (isLoading) {
@@ -137,7 +137,7 @@ fun ManageReportScreen(viewModel: ViewModel) {
                 ) {
                     Row {
                         Text(
-                            text = aedState?.aedBasics?.address ?: "",
+                            text = aedState?.aedBasics?.id?: "",
                             modifier = Modifier /*TODO: Show address or city?*/
                                 .weight(1f)
                                 .padding(horizontal = 5.dp)

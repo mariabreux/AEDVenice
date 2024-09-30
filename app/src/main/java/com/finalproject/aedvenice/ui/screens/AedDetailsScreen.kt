@@ -65,7 +65,7 @@ fun AedDetailsScreen(
         Column(
             modifier = Modifier
                 .clip(RoundedCornerShape(5.dp))
-                .height(525.dp)
+                .height(560.dp)
                 .width(300.dp)
                 .background(LightPink)
                 .border(2.dp, color = DarkPink, shape = RoundedCornerShape(5.dp)),
@@ -173,6 +173,30 @@ fun AedDetailsScreen(
                     )
 
                 }
+                Spacer(modifier = Modifier.padding(10.dp))
+
+                if (aed?.phoneNumber != null) {
+                    var numbers = aed.phoneNumber.split(";")
+                    var cnt = 0
+                    if(numbers.size > 1){
+                        for(i in numbers){
+                            cnt++
+                            Text(
+                                text = "Telephone$cnt: $i",
+                                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold)
+                            )
+                        }
+                    }
+                    else{
+                        Text(
+                            text = "Telephone: " + aed.phoneNumber,
+                            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold)
+                        )
+                    }
+
+
+                }
+
             }
 
             Spacer(modifier = Modifier.height(55.dp))

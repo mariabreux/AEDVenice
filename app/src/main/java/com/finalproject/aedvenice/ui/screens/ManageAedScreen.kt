@@ -3,6 +3,7 @@ package com.finalproject.aedvenice.ui.screens
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -43,6 +44,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -55,6 +57,10 @@ import com.finalproject.aedvenice.ui.theme.DarkPink
 
 @Composable
 fun ManageAedScreen(viewModel: ViewModel, navController: NavHostController) {
+    var showDialog by remember { mutableStateOf(false) }
+    val onDismiss = { showDialog = false }
+    var aedId by remember { mutableStateOf<String?>("") }
+    val aedState by viewModel.getAedById(aedId ?: "").observeAsState(initial = null)
     var isLoading by remember { mutableStateOf(true) }
     var aedBasics by remember {
         mutableStateOf(emptyList<AedBasics>())
@@ -139,77 +145,93 @@ fun ManageAedScreen(viewModel: ViewModel, navController: NavHostController) {
                 item {
 
 
-                aedBasics.forEach { aed ->
-                    Row {
-                        Text(
-                            text = aed.address ?: "", modifier = Modifier
-                                .weight(1f)
-                                .padding(horizontal = 15.dp)
-                                .align(Alignment.CenterVertically)
-                        )
+                    aedBasics.forEach { aed ->
+                        Row {
+                            Text(
+                                text = aed.address ?: "", modifier = Modifier
+                                    .weight(1f)
+                                    .padding(horizontal = 15.dp)
+                                    .align(Alignment.CenterVertically)
+                            )
 
-                        Divider(
-                            modifier = Modifier
-                                .height(360.dp)
-                                .width(1.dp),
-                            color = Color.LightGray
-                        )
+                            Divider(
+                                modifier = Modifier
+                                    .height(360.dp)
+                                    .width(1.dp),
+                                color = Color.LightGray
+                            )
 
 
-                        Text(
-                            text = aed.notes ?: "", modifier = Modifier
-                                .weight(1.5f)
-                                .padding(horizontal = 3.dp)
-                                .align(Alignment.CenterVertically)
+                            Text(
+                                text = aed.notes ?: "", modifier = Modifier
+                                    .weight(1.5f)
+                                    .padding(horizontal = 3.dp)
+                                    .align(Alignment.CenterVertically)
 
-                        )
+                            )
 
-                        Divider(
-                            modifier = Modifier
-                                .height(360.dp)
-                                .width(1.dp),
-                            color = Color.LightGray
-                        )
+                            Divider(
+                                modifier = Modifier
+                                    .height(360.dp)
+                                    .width(1.dp),
+                                color = Color.LightGray
+                            )
 
-                        Column(modifier = Modifier.offset(0.dp, (140).dp)) {
-                            IconButton(onClick = {
-                                navController.navigate(
-                                    "AddEditAed?aedId=${aed.id}"
-                                )
-                            }) {
-                                Icon(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.edit),
-                                    tint = Color.Unspecified,
-                                    contentDescription = "edit",
-                                    modifier = Modifier
-                                        .size(25.dp)
-                                )
-                            }
-
-                            IconButton(onClick = {
-                                aed.id?.let {
-                                    viewModel.deleteAed(it, {
-                                        Log.d("Delete Aed", "Aed deleted")
-                                    },
-                                        {
-                                            Log.e("Delete Aed", "Error deleting Aed")
-
-                                        })
+                            Column(modifier = Modifier.offset(0.dp, (140).dp)) {
+                                IconButton(onClick = {
+                                    navController.navigate(
+                                        "AddEditAed?aedId=${aed.id}"
+                                    )
+                                }) {
+                                    Icon(
+                                        imageVector = ImageVector.vectorResource(id = R.drawable.edit),
+                                        tint = Color.Unspecified,
+                                        contentDescription = "edit",
+                                        modifier = Modifier
+                                            .size(25.dp)
+                                    )
                                 }
-                            }) {
-                                Icon(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.delete),
-                                    tint = Color.Unspecified,
-                                    contentDescription = "delete",
+
+                                IconButton(onClick = {
+                                    aed.id?.let {
+                                        viewModel.deleteAed(it, {
+                                            Log.d("Delete Aed", "Aed deleted")
+                                        },
+                                            {
+                                                Log.e("Delete Aed", "Error deleting Aed")
+
+                                            })
+                                    }
+                                }) {
+                                    Icon(
+                                        imageVector = ImageVector.vectorResource(id = R.drawable.delete),
+                                        tint = Color.Unspecified,
+                                        contentDescription = "delete",
+                                        modifier = Modifier
+                                            .size(25.dp)
+                                    )
+                                }
+                                Text(
+                                    text = "More info",
+                                    style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
+                                    color = DarkPink,
+                                    textDecoration = TextDecoration.Underline,
+
                                     modifier = Modifier
-                                        .size(25.dp)
+                                        .padding(horizontal = 5.dp)
+                                        //.align(Alignment.CenterVertically)
+                                        .clickable {
+                                            aedId = aed.id
+                                            showDialog = true
+                                        },
+                                    textAlign = TextAlign.Center
                                 )
+
                             }
                         }
+                        Divider()
                     }
-                    Divider()
                 }
-            }
 
             }
 
@@ -217,6 +239,16 @@ fun ManageAedScreen(viewModel: ViewModel, navController: NavHostController) {
         }
 
 
+    }
+    if (showDialog) {
+        AedDetailsScreen(
+            onDismiss = { onDismiss() },
+            onConfirm = { },
+            navController = navController,
+            aed = aedState,
+            aedId = aedState?.aedBasics?.id,
+            showButton = false
+        )
     }
 
 

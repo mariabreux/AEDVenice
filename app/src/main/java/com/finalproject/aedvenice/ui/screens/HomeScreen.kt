@@ -81,60 +81,7 @@ fun HomeScreen(navController: NavHostController, viewModel: ViewModel) {
     ) {
         MapScreen(state = viewModel.state.value, viewModel, navController)
 
-        /*Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier
-                .padding(20.dp)
-                .padding(top = 25.dp)
-        ) {
-            OutlinedTextField(
-                value = searchValue,
-                onValueChange = { searchValue = it },
-
-                placeholder = {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 55.dp)
-                    ) {
-                        Text(
-                            text = "Search",
-                        )
-                    }
-
-
-                },
-
-                shape = RoundedCornerShape(10.dp),
-                colors = TextFieldDefaults.outlinedTextFieldColors(backgroundColor = Color.White),
-                modifier = Modifier
-                    .height(70.dp)
-                    .padding(10.dp),
-
-                leadingIcon = {
-                    IconButton(onClick = { showDialog = true }) {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(id = R.drawable.search),
-                            tint = Color.Unspecified,
-                            contentDescription = "search",
-                            modifier = Modifier
-                                .size(30.dp)
-                        )
-                    }
-
-                }
-
-            )
-        }*/
-
-
     }
-    if (showDialog) { /*TODO: Remove?*/
-        //AedDetailsScreen(onDismiss = onDismiss, onConfirm = onConfirm, navController)
-    }
-
-    //TODO: search and select an aed to show details
 
 }
 

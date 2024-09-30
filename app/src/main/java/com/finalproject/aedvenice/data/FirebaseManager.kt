@@ -43,7 +43,7 @@ class FirebaseManager{
     }
 
     fun getAedBasicsList(onUpdate: (List<AedBasics>) -> Unit){
-        val aedCollection = db.collection("aed") /*TODO: change to Aed*/
+        val aedCollection = db.collection("aed")
         //val aedTestCollection = db.collection("aedTest")
 
         aedCollection.limit(150)/*aedTestCollection*/.addSnapshotListener { snapshot, exception ->
@@ -61,8 +61,7 @@ class FirebaseManager{
 
                     val aed = AedBasics(
                         id, address, GeoPoint(geoPoint["lat"], geoPoint["lon"]), notes
-                        //id, address, GeoPoint(geoPoint["latitude"], geoPoint["longitude"]), notes
-                        /*TODO: change to lat and lon after changing the collection to aed */
+
                     )
                     aeds.add(aed)
                 }
@@ -78,7 +77,7 @@ class FirebaseManager{
             return aedLiveData
         }
 
-        db.collection("aed")/*TODO: change to Aed*/
+        db.collection("aed")
         //db.collection("aedTest")
             .document(id)
             .get()
@@ -91,7 +90,7 @@ class FirebaseManager{
                     val basics = AedBasics(
                         docId, address, GeoPoint(geoPoint?.get("lat"), geoPoint?.get("lon")), notes
                         //docId, address, GeoPoint(geoPoint?.get("latitude"), geoPoint?.get("longitude")), notes
-                        /*TODO: change to lat and lon after changing the collection to aed */
+
                     )
                     val name = document.getString("nome")
                     val city = document.getString("citta")
@@ -117,7 +116,7 @@ class FirebaseManager{
         onSuccess: () -> Unit,
         onFailure: () -> Unit
     ){
-        db.collection("aed") /*TODO: change to Aed*/
+        db.collection("aed")
         //db.collection("aedTest")
             .document(id)
             .delete()
@@ -137,7 +136,7 @@ class FirebaseManager{
         onSuccess: () -> Unit,
         onFailure: () -> Unit
     ){
-        db.collection("aed") /*TODO: change to Aed*/
+        db.collection("aed")
         //db.collection("aedTest")
             .document(id)
             .update(
@@ -283,7 +282,7 @@ class FirebaseManager{
                         val reportId = document.id
                         val reportAed = document.getString("aed")
                         val reportMessage = document.getString("message")
-                        val geoPoint = document.get("coordinates") as Map<String, Double>
+                        val geoPoint = document.get("coordinates") as? Map<String, Double> ?: emptyMap()
                         val uuid = document.getString("uuid")
 
                         val rep = Report(reportId, reportAed, GeoPoint(geoPoint["latitude"], geoPoint["longitude"]), reportMessage, uuid)

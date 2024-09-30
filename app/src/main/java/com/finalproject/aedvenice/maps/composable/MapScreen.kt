@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,11 +25,13 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.finalproject.aedvenice.R
@@ -153,7 +156,8 @@ fun MapScreen(
                         .padding(start = 55.dp)
                 ) {
                     Text(
-                        text = "Search",
+                        text = "Search by city name",
+                        modifier = Modifier.offset((-30).dp)
                     )
                 }
             },
@@ -161,7 +165,7 @@ fun MapScreen(
             shape = RoundedCornerShape(10.dp),
             colors = TextFieldDefaults.outlinedTextFieldColors(backgroundColor = Color.White),
             modifier = Modifier
-                .height(70.dp)
+                .height(75.dp)
                 .padding(10.dp),
 
             leadingIcon = {

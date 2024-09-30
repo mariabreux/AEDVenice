@@ -240,11 +240,3 @@ fun AedDetailsScreen(
 
 }
 
-
-@Preview(showBackground = true)
-@Composable
-fun AedDetailScreenPreview() {
-//    AedDetailsScreen(onDismiss = { /*TODO*/ }) {
-//
-//    }
-}

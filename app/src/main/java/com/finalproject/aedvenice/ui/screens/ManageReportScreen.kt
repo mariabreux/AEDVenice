@@ -72,7 +72,6 @@ fun ManageReportScreen(viewModel: ViewModel) {
 
     var showDialog by remember { mutableStateOf(false) }
     val onDismiss = { showDialog = false }
-    val onConfirm = { } /*TODO: Remove*/
     var selectedReport by remember { mutableStateOf<Report?>(null) }
     val context = LocalContext.current
 
@@ -138,7 +137,7 @@ fun ManageReportScreen(viewModel: ViewModel) {
                     Row {
                         Text(
                             text = aedState?.aedBasics?.id?: "",
-                            modifier = Modifier /*TODO: Show address or city?*/
+                            modifier = Modifier
                                 .weight(1f)
                                 .padding(horizontal = 5.dp)
                                 .align(Alignment.CenterVertically)
@@ -178,7 +177,6 @@ fun ManageReportScreen(viewModel: ViewModel) {
         selectedReport?.let {
             MoreInfoScreen(
                 onDismiss = { onDismiss() },
-                onConfirm = { onConfirm() },
                 it,
                 aedState,
                 viewModel,
@@ -191,7 +189,6 @@ fun ManageReportScreen(viewModel: ViewModel) {
 @Composable
 fun MoreInfoScreen(
     onDismiss: () -> Unit,
-    onConfirm: () -> Unit, /*TODO: Remove*/
     report: Report,
     aed: Aed?,
     viewModel: ViewModel,

@@ -1,7 +1,9 @@
 package com.finalproject.aedvenice.ui.screens
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -47,6 +49,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
 import com.finalproject.aedvenice.R
 import com.finalproject.aedvenice.data.ViewModel
@@ -54,11 +57,13 @@ import com.finalproject.aedvenice.data.aed.Aed
 import com.finalproject.aedvenice.data.aed.AedBasics
 import com.finalproject.aedvenice.ui.theme.BorderPink
 import com.finalproject.aedvenice.ui.theme.DarkPink
+import com.finalproject.aedvenice.ui.theme.LightPink
 
 @Composable
 fun ManageAedScreen(viewModel: ViewModel, navController: NavHostController) {
     var showDialog by remember { mutableStateOf(false) }
-    val onDismiss = { showDialog = false }
+    var deleteDialog by remember { mutableStateOf(false) }
+    var onDismiss = { showDialog = false }
     var aedId by remember { mutableStateOf<String?>("") }
     val aedState by viewModel.getAedById(aedId ?: "").observeAsState(initial = null)
     var isLoading by remember { mutableStateOf(true) }
@@ -193,15 +198,17 @@ fun ManageAedScreen(viewModel: ViewModel, navController: NavHostController) {
                                 }
 
                                 IconButton(onClick = {
-                                    aed.id?.let {
-                                        viewModel.deleteAed(it, {
-                                            Log.d("Delete Aed", "Aed deleted")
-                                        },
-                                            {
-                                                Log.e("Delete Aed", "Error deleting Aed")
-
-                                            })
-                                    }
+                                    aedId = aed.id
+                                    deleteDialog = true
+//                                    aed.id?.let {
+//                                        viewModel.deleteAed(it, {
+//                                            Log.d("Delete Aed", "Aed deleted")
+//                                        },
+//                                            {
+//                                                Log.e("Delete Aed", "Error deleting Aed")
+//
+//                                            })
+//                                    }
                                 }) {
                                     Icon(
                                         imageVector = ImageVector.vectorResource(id = R.drawable.delete),
@@ -251,13 +258,105 @@ fun ManageAedScreen(viewModel: ViewModel, navController: NavHostController) {
         )
     }
 
+    if(deleteDialog){
+        DeleteConfirmation(onDismiss = { deleteDialog = false }, aed = aedState, aedId, viewModel = viewModel)
+
+    }
+
 
 }
 
-/*
-@Preview(showBackground = true)
 @Composable
-fun ManageAedScreenPreview() {
-    ManageAedScreen(viewModel)
+fun DeleteConfirmation(
+    onDismiss: () -> Unit,
+    aed: Aed?,
+    aedId: String?,
+    viewModel: ViewModel,
+){
+    Dialog(onDismissRequest = onDismiss) {
+        Column(
+            modifier = Modifier
+                .clip(RoundedCornerShape(5.dp))
+                .height(300.dp)
+                .width(310.dp)
+                .background(LightPink)
+                .border(2.dp, color = DarkPink, shape = RoundedCornerShape(5.dp)),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.Top,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 10.dp)
+                    .padding(horizontal = 5.dp)
+            ) {
+                androidx.compose.material.Text(
+                    text = aed?.name.toString(),
+                    style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold),
+                )
+            }
+            Spacer(modifier = Modifier.padding(20.dp))
+
+            Column(
+                horizontalAlignment = Alignment.Start,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 25.dp)
+            ) {
+                androidx.compose.material.Text(
+                    text = "Are you sure you want to delete this AED?",
+                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold)
+                )
+
+            }
+            Spacer(modifier = Modifier.padding(25.dp))
+
+            Button(modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 40.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = DarkPink,
+                ),
+                border = BorderStroke(2.dp, BorderPink),
+                onClick = {
+                    aedId?.let {
+                        viewModel.deleteAed(it, {
+                            Log.d("Delete Aed", "Aed deleted")
+                        },
+                            {
+                                Log.e("Delete Aed", "Error deleting Aed")
+
+                            })
+                    }
+                    onDismiss()
+                }
+            ) {
+                androidx.compose.material.Text(
+                    text = "Delete AED",
+                    color = Color.White,
+                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
+                )
+            }
+
+            Button(modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 40.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = DarkPink,
+                ),
+                border = BorderStroke(2.dp, BorderPink),
+                onClick = {
+                    onDismiss()
+                }
+            ) {
+                androidx.compose.material.Text(
+                    text = "Cancel",
+                    color = Color.White,
+                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
+                )
+            }
+        }
+    }
 }
-*/

@@ -267,11 +267,12 @@ fun MoreInfoScreen(
                 verticalAlignment = Alignment.Top,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 5.dp)
+                    .padding(top = 10.dp)
+                    .padding(horizontal = 5.dp)
             ) {
                 androidx.compose.material.Text(
                     text = aed?.name.toString(),
-                    style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.SemiBold),
+                    style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold),
                 )
             }
             Spacer(modifier = Modifier.padding(10.dp))

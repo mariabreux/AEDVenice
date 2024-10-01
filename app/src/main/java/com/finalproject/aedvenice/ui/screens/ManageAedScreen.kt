@@ -146,10 +146,10 @@ fun ManageAedScreen(viewModel: ViewModel, navController: NavHostController) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 55.dp)
+                        .padding(start = 45.dp)
                 ) {
                     Text(
-                        text = "Search AED",
+                        text = "Search AED (id, city, address)",
                         modifier = Modifier.offset((-30).dp)
                     )
                 }

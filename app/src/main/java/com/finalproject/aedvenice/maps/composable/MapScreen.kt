@@ -73,7 +73,7 @@ fun MapScreen(
     LaunchedEffect(Unit) {
         viewModel.getAedBasicsList { aeds ->
             aedBasics = aeds
-            Toast.makeText(context, "All aeds are loaded" + aedBasics.size, Toast.LENGTH_SHORT).show()
+            //Toast.makeText(context, "All aeds are loaded" + aedBasics.size, Toast.LENGTH_SHORT).show()
         }
         viewModel.getBannedUsers { bU ->
             bannedUsers = bU

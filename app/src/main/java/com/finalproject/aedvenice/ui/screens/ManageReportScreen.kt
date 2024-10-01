@@ -14,12 +14,14 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
@@ -48,6 +50,7 @@ import androidx.compose.ui.window.Dialog
 import com.finalproject.aedvenice.R
 import com.finalproject.aedvenice.data.ViewModel
 import com.finalproject.aedvenice.data.aed.Aed
+import com.finalproject.aedvenice.data.aed.AedBasics
 import com.finalproject.aedvenice.data.aed.Report
 import com.finalproject.aedvenice.ui.theme.BorderPink
 import com.finalproject.aedvenice.ui.theme.DarkPink
@@ -62,11 +65,23 @@ fun ManageReportScreen(viewModel: ViewModel) {
     var isLoading by remember { mutableStateOf(true) }
     var aedId by remember { mutableStateOf<String?>("") }
     val aedState by viewModel.getAedById(aedId ?: "").observeAsState(initial = null)
+    var aedSearch by remember { mutableStateOf("") }
+    var filteredReports by remember {
+        mutableStateOf(emptyList<Report>())
+    }
 
     LaunchedEffect(Unit) {
         viewModel.getReports { reps ->
             reports = reps
+            filteredReports = reps
             isLoading = false
+        }
+    }
+
+    // when searching, filter AEDs
+    LaunchedEffect(aedSearch) {
+        filteredReports = reports.filter {
+            it.aedId?.contains(aedSearch, ignoreCase = true) == true
         }
     }
 
@@ -111,7 +126,36 @@ fun ManageReportScreen(viewModel: ViewModel) {
             }
         }
 
-        Spacer(modifier = Modifier.padding(30.dp))
+        Spacer(modifier = Modifier.padding(5.dp))
+
+        androidx.compose.material.OutlinedTextField(
+            value = aedSearch,
+            onValueChange = { aedSearch = it },
+
+            placeholder = {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 55.dp)
+                ) {
+                    Text(
+                        text = "Search by AED id",
+                        modifier = Modifier.offset((-30).dp)
+                    )
+                }
+            },
+
+            shape = RoundedCornerShape(10.dp),
+            colors = TextFieldDefaults.outlinedTextFieldColors(backgroundColor = Color.White),
+            modifier = Modifier
+                .height(75.dp)
+                .padding(10.dp)
+        )
+
+        Spacer(modifier = Modifier.padding(5.dp))
+
+
+        //Spacer(modifier = Modifier.padding(30.dp))
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -125,7 +169,8 @@ fun ManageReportScreen(viewModel: ViewModel) {
             Spacer(modifier = Modifier.padding(15.dp))
         }
         LazyColumn {
-            items(reports) { report ->
+            //items(reports) { report ->
+            items(filteredReports) { report ->
                 aedId = report.aedId
                 Column(
                     modifier = Modifier

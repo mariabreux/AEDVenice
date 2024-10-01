@@ -22,7 +22,7 @@ class FirebaseManager{
         val newAed = hashMapOf(
             "nome" to aed.name,
             "indirizzo" to aed.aedBasics?.address,
-            "citta" to aed.city,
+            "citta" to aed.aedBasics?.city,
             "geo_point" to aed.aedBasics?.geoPoint,
             "note" to aed.aedBasics?.notes,
             "orari" to aed.timetable,
@@ -58,9 +58,10 @@ class FirebaseManager{
                     val address = document.getString("indirizzo")
                     val notes = document.getString("note")
                     val geoPoint = document.get("geo_point") as? Map<String, Double> ?: emptyMap()
+                    val city = document.getString("citta")
 
                     val aed = AedBasics(
-                        id, address, GeoPoint(geoPoint["lat"], geoPoint["lon"]), notes
+                        id, address, GeoPoint(geoPoint["lat"], geoPoint["lon"]), notes, city
 
                     )
                     aeds.add(aed)
@@ -87,18 +88,18 @@ class FirebaseManager{
                     val address = document.getString("indirizzo")
                     val notes = document.getString("note")
                     val geoPoint = document.get("geo_point") as? Map<String, Double> ?: emptyMap()
+                    val city = document.getString("citta")
                     val basics = AedBasics(
-                        docId, address, GeoPoint(geoPoint?.get("lat"), geoPoint?.get("lon")), notes
+                        docId, address, GeoPoint(geoPoint?.get("lat"), geoPoint?.get("lon")), notes, city
                         //docId, address, GeoPoint(geoPoint?.get("latitude"), geoPoint?.get("longitude")), notes
 
                     )
                     val name = document.getString("nome")
-                    val city = document.getString("citta")
                     val location = document.getString("ubicazione")
                     val timetable = document.getString("orari")
                     val phoneNumber = document.getString("telefono") //as? List<String>
                     val aed = Aed(
-                        basics, name, city, location, timetable, phoneNumber
+                        basics, name/*, city*/, location, timetable, phoneNumber
                     )
                     aedLiveData.value = aed
                 }else {
@@ -143,7 +144,7 @@ class FirebaseManager{
                 mapOf(
                     "nome" to aed.name,
                     "indirizzo" to aed.aedBasics?.address,
-                    "citta" to aed.city,
+                    "citta" to aed.aedBasics?.city,
                     "geo_point" to aed.aedBasics?.geoPoint,
                     "note" to aed.aedBasics?.notes,
                     "orari" to aed.timetable,

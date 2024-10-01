@@ -117,10 +117,11 @@ fun AddEditAedScreen(viewModel: ViewModel, navController: NavHostController, aed
                                     null,
                                     address,
                                     coordinates,
-                                    note
+                                    note,
+                                    city
                                 ),
                                 name,
-                                city,
+                                //city,
                                 location,
                                 time,
                                 phoneNum
@@ -134,10 +135,11 @@ fun AddEditAedScreen(viewModel: ViewModel, navController: NavHostController, aed
                                                 id = aedId,
                                                 address = address,
                                                 geoPoint = coordinates,
-                                                notes = note
+                                                notes = note,
+                                                city = city,
                                             ),
                                             name = name,
-                                            city = city,
+                                            //city = city,
                                             location = location,
                                             timetable = time,
                                             phoneNumber = phoneNum
@@ -213,7 +215,7 @@ fun AddEditAedScreen(viewModel: ViewModel, navController: NavHostController, aed
             }
             item {
                 city =
-                    aedState?.city?.let { formAEDString(text = "City", tfValue = it) }.toString()
+                    aedState?.aedBasics?.city?.let { formAEDString(text = "City", tfValue = it) }.toString()
             }
             item {
                 location =

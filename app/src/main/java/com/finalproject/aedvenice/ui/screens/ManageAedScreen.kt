@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,6 +23,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
@@ -55,6 +57,7 @@ import com.finalproject.aedvenice.R
 import com.finalproject.aedvenice.data.ViewModel
 import com.finalproject.aedvenice.data.aed.Aed
 import com.finalproject.aedvenice.data.aed.AedBasics
+import com.finalproject.aedvenice.maps.composable.getLocation
 import com.finalproject.aedvenice.ui.theme.BorderPink
 import com.finalproject.aedvenice.ui.theme.DarkPink
 import com.finalproject.aedvenice.ui.theme.LightPink
@@ -66,8 +69,12 @@ fun ManageAedScreen(viewModel: ViewModel, navController: NavHostController) {
     var onDismiss = { showDialog = false }
     var aedId by remember { mutableStateOf<String?>("") }
     val aedState by viewModel.getAedById(aedId ?: "").observeAsState(initial = null)
+    var aedSearch by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(true) }
     var aedBasics by remember {
+        mutableStateOf(emptyList<AedBasics>())
+    }
+    var filteredAeds by remember {
         mutableStateOf(emptyList<AedBasics>())
     }
 
@@ -76,10 +83,19 @@ fun ManageAedScreen(viewModel: ViewModel, navController: NavHostController) {
         //isLoading = false
         viewModel.getAedBasicsList { aeds ->
             aedBasics = aeds
+            filteredAeds = aeds //firstly we display all AEDs
             isLoading = false
         }
     }
 
+    // when searching, filter AEDs
+    LaunchedEffect(aedSearch) {
+        filteredAeds = aedBasics.filter { aed ->
+            aed.id?.contains(aedSearch, ignoreCase = true) == true ||
+            aed.address?.contains(aedSearch, ignoreCase = true) == true ||
+            aed.city?.contains(aedSearch, ignoreCase = true) == true
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -120,8 +136,35 @@ fun ManageAedScreen(viewModel: ViewModel, navController: NavHostController) {
             }
         }
 
+        Spacer(modifier = Modifier.padding(5.dp))
 
-        Spacer(modifier = Modifier.padding(30.dp))
+        androidx.compose.material.OutlinedTextField(
+            value = aedSearch,
+            onValueChange = { aedSearch = it },
+
+            placeholder = {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 55.dp)
+                ) {
+                    Text(
+                        text = "Search AED",
+                        modifier = Modifier.offset((-30).dp)
+                    )
+                }
+            },
+
+            shape = RoundedCornerShape(10.dp),
+            colors = TextFieldDefaults.outlinedTextFieldColors(backgroundColor = Color.White),
+            modifier = Modifier
+                .height(75.dp)
+                .padding(10.dp)
+        )
+
+        //Spacer(modifier = Modifier.padding(30.dp))
+        Spacer(modifier = Modifier.padding(5.dp))
+        //Spacer(modifier = Modifier.weight(1f))
 
         Column {
             Row(
@@ -150,7 +193,8 @@ fun ManageAedScreen(viewModel: ViewModel, navController: NavHostController) {
                 item {
 
 
-                    aedBasics.forEach { aed ->
+                    //aedBasics.forEach { aed ->
+                    filteredAeds.forEach { aed ->
                         Row {
                             Text(
                                 text = aed.address ?: "", modifier = Modifier

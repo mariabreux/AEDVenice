@@ -76,7 +76,7 @@ fun AedDetailsScreen(
                 verticalAlignment = Alignment.Top,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 16.dp)
+                    .padding(top = 16.dp, start = 10.dp)
             ) {
                 Text(
                     text = "AED: " + aed?.name,

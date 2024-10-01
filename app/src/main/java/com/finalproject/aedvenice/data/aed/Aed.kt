@@ -4,13 +4,14 @@ data class AedBasics(
     val id : String ?= null,
     val address : String ?= null,
     val geoPoint : GeoPoint ?= null,
-    val notes : String ?= null
+    val notes : String ?= null,
+    val city : String ?= null
 )
 
 data class Aed(
     val aedBasics: AedBasics ?= null,
     val name : String ?= null,
-    val city : String ?= null,
+    //val city : String ?= null,
     val location : String ?= null,
     val timetable : String ?= null,
     //val phoneNumber : List<String> ?= emptyList()

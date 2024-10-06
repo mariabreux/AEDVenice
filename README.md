@@ -5,6 +5,7 @@ Run the project on desktop:
 - Run the application.
 
 Run the project on mobile:
+- Go to app/release
 - Download the "app-release.apk" file in the release folder;
 - Install the apk; 
 - Open the app.

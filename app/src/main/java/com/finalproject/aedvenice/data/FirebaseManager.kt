@@ -30,8 +30,7 @@ class FirebaseManager{
             "ubicazione" to aed.location
         )
 
-        //db.collection("aed") /*TODO: change to Aed*/
-        db.collection("aedTest")
+        db.collection("aed")
             .add(newAed)
             .addOnSuccessListener { documentReference ->
                 Log.d("TAG", "AED created with ID: ${documentReference.id}")
